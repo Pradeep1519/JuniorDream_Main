@@ -104,7 +104,6 @@ export function HeroSection() {
   }, []);
 
   const sidebarWidth = 220 - (scrollProgress * scrollProgress * 160);
-  const headerStripWidth = Math.max(sidebarWidth, 60);
   const sidebarLogoSize = 190 - (scrollProgress * 100);
   const textTranslateY = scrollProgress * -200;
   const textOpacity = 1 - scrollProgress;
@@ -137,7 +136,7 @@ export function HeroSection() {
             <div
               className="flex items-start justify-center flex-1 transition-all duration-700 ease-out"
               style={{
-                paddingTop: isMobile ? 80 : 120,
+                paddingTop: 120,
                 opacity: 1 - scrollProgress,
                 transform: `scale(${1 - (scrollProgress * 0.3)})`,
               }}
@@ -266,7 +265,7 @@ export function HeroSection() {
           {/* ✅ Image Grid - Stack on mobile, horizontal on desktop/tablet */}
           {isMobile ? (
             <div className="flex-1 min-h-0 overflow-y-auto flex flex-col">
-              {heroPanels.map((panel, i) => (
+              {heroPanels.map((panel) => (
                 <div
                   key={panel.label}
                   className="relative overflow-hidden cursor-pointer"

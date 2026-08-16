@@ -26,7 +26,7 @@ const buttonVariants = cva(
 );
 
 interface ButtonProps
-  extends React.AnchorHTMLAttributes<HTMLAnchorElement>,
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   href?: string;
   children: React.ReactNode;
@@ -38,7 +38,6 @@ export function Button({ className, variant, size, href, children, ...props }: B
       <Link
         to={href}
         className={cn(buttonVariants({ variant, size }), className)}
-        {...(props as any)}
       >
         {children}
       </Link>
@@ -48,7 +47,7 @@ export function Button({ className, variant, size, href, children, ...props }: B
   return (
     <button
       className={cn(buttonVariants({ variant, size }), className)}
-      {...(props as any)}
+      {...props}
     >
       {children}
     </button>
