@@ -232,8 +232,8 @@ export function HeroSection() {
               Where Passion Meets Profession
             </p>
 
-            {/* ✅ Typewriter Text with Cursor */}
-            <div className="flex items-start" style={{ minHeight: isMobile ? 40 : 30, flexWrap: "wrap" }}>
+            {/* ✅ Typewriter Text with Cursor - INLINE FIX */}
+            <div className="flex items-start" style={{ minHeight: isMobile ? 40 : 30 }}>
               <span
                 className="text-white/90 font-light"
                 style={{
@@ -242,23 +242,23 @@ export function HeroSection() {
                   fontStyle: "italic",
                   letterSpacing: "0.02em",
                   lineHeight: 1.4,
-                  flex: 1,
-                  minWidth: 0,
                 }}
               >
                 {displayText}
+                {/* Cursor - Inline with text */}
+                <span
+                  className="inline-block"
+                  style={{
+                    width: 2,
+                    height: "1.2em",
+                    backgroundColor: "rgba(255,255,255,0.9)",
+                    animation: "blink 0.8s infinite",
+                    marginLeft: 2,
+                    verticalAlign: "text-bottom",
+                    display: "inline-block",
+                  }}
+                />
               </span>
-              {/* Blinking Cursor */}
-              <span
-                className="inline-block ml-1"
-                style={{
-                  width: 2,
-                  height: isMobile ? "1em" : "1.2em",
-                  backgroundColor: "rgba(255,255,255,0.9)",
-                  animation: "blink 0.8s infinite",
-                  marginTop: 2,
-                }}
-              />
             </div>
           </div>
 
