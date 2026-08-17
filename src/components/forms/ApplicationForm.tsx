@@ -1,6 +1,15 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { 
+  collection, 
+  serverTimestamp, 
+  doc, 
+  getDoc, 
+  setDoc, 
+  query,
+  where,
+  getDocs
+} from "firebase/firestore";
 import { Button } from "@/components/common/Button";
 import { db } from "@/lib/firebase";
 
@@ -9,6 +18,68 @@ const inputClass =
 const labelClass = "text-sm font-medium mb-2 block";
 
 type Status = "idle" | "submitting" | "success" | "error";
+
+// Fast Custom Application ID Generator
+async function generateApplicationId(): Promise<string> {
+  const counterRef = doc(db, "counters", "applicationCounter");
+  
+  try {
+    const counterDoc = await getDoc(counterRef);
+    let nextNumber = 1;
+    
+    if (counterDoc.exists()) {
+      const currentCount = counterDoc.data().count || 0;
+      nextNumber = currentCount + 1;
+      // Use setDoc for faster update
+      await setDoc(counterRef, { count: nextNumber }, { merge: true });
+    } else {
+      // Pehli baar counter create karo
+      await setDoc(counterRef, { 
+        name: "applicationCounter",
+        count: 1,
+        createdAt: serverTimestamp()
+      });
+      nextNumber = 1;
+    }
+    
+    const formattedNumber = String(nextNumber).padStart(4, "0");
+    return `JR${formattedNumber}`;
+  } catch (error) {
+    console.error("Error generating application ID:", error);
+    const timestamp = Date.now().toString().slice(-6);
+    return `JR${timestamp}`;
+  }
+}
+
+// Duplicate Check Function
+async function checkDuplicateApplication(mobile: string, email: string): Promise<boolean> {
+  try {
+    const applicationsRef = collection(db, "applications");
+    
+    // Mobile number se check karo
+    const mobileQuery = query(applicationsRef, where("mobile", "==", mobile));
+    const mobileSnapshot = await getDocs(mobileQuery);
+    
+    if (!mobileSnapshot.empty) {
+      return true; // Duplicate found
+    }
+    
+    // Email se check karo (agar email provided hai)
+    if (email) {
+      const emailQuery = query(applicationsRef, where("email", "==", email));
+      const emailSnapshot = await getDocs(emailQuery);
+      
+      if (!emailSnapshot.empty) {
+        return true; // Duplicate found
+      }
+    }
+    
+    return false; // No duplicate
+  } catch (error) {
+    console.error("Error checking duplicate:", error);
+    return false; // Agar check fail ho toh allow karo
+  }
+}
 
 export function ApplicationForm() {
   const [searchParams] = useSearchParams();
@@ -19,6 +90,7 @@ export function ApplicationForm() {
 
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [applicationId, setApplicationId] = useState("");
 
   const [formData, setFormData] = useState({
     studentName: "",
@@ -54,29 +126,55 @@ export function ApplicationForm() {
     setErrorMsg("");
 
     try {
-      await addDoc(collection(db, "applications"), {
-        studentName: formData.studentName,
+      // Step 1: Check duplicate (Fast check)
+      const isDuplicate = await checkDuplicateApplication(
+        formData.mobile.trim(),
+        formData.email.trim()
+      );
+
+      if (isDuplicate) {
+        setStatus("error");
+        setErrorMsg("An application with this mobile number or email already exists. Please contact us directly.");
+        return;
+      }
+
+      // Step 2: Generate Application ID
+      const customId = await generateApplicationId();
+      setApplicationId(customId);
+
+      // Step 3: Prepare data
+      const applicationData = {
+        applicationId: customId,
+        studentName: formData.studentName.trim(),
         dob: formData.dob || null,
         gender: formData.gender || null,
-        fatherName: formData.fatherName || null,
-        motherName: formData.motherName || null,
+        fatherName: formData.fatherName.trim() || null,
+        motherName: formData.motherName.trim() || null,
         stream,
         classApplying: formData.classApplying,
         batchLevel: prefilledBatch || null,
         tier: prefilledTier || null,
-        previousSchool: formData.previousSchool || null,
-        mobile: formData.mobile,
-        alternateMobile: formData.alternateMobile || null,
-        email: formData.email || null,
-        address: formData.address || null,
+        previousSchool: formData.previousSchool.trim() || null,
+        mobile: formData.mobile.trim(),
+        alternateMobile: formData.alternateMobile.trim() || null,
+        email: formData.email.trim() || null,
+        address: formData.address.trim(),
         howHeard: formData.howHeard || null,
-        referralCode: formData.referralCode || null,
+        referralCode: formData.referralCode.trim() || null,
         agreedTerms: formData.agreedTerms,
         status: "new",
         createdAt: serverTimestamp(),
-      });
+        updatedAt: serverTimestamp(),
+      };
+
+      // Step 4: Save to Firestore (using custom ID as document ID)
+      const docRef = doc(db, "applications", customId);
+      await setDoc(docRef, applicationData);
+
+      console.log("Application saved with ID:", customId);
       setStatus("success");
     } catch (err) {
+      console.error("Error saving application:", err);
       setStatus("error");
       setErrorMsg(err instanceof Error ? err.message : "Please try again.");
     }
@@ -85,11 +183,52 @@ export function ApplicationForm() {
   if (status === "success") {
     return (
       <div className="text-center py-16">
-        <h3 className="text-2xl font-medium mb-3">Application Received! 🎉</h3>
+        <div className="mb-6">
+          <span className="text-6xl block mb-4">🎉</span>
+          <h3 className="text-2xl font-medium mb-3">Application Received!</h3>
+        </div>
+        
+        {/* Application ID Display */}
+        {applicationId && (
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4 inline-block">
+            <p className="text-sm text-gray-500 mb-1">Your Application ID</p>
+            <p className="text-xl font-bold text-black tracking-wider">{applicationId}</p>
+          </div>
+        )}
+        
         <p className="text-foreground/60">
-          Thank you, {formData.studentName}. Our team will reach out to you on{" "}
-          {formData.mobile} shortly.
+          Thank you, <strong>{formData.studentName}</strong>. Our team will reach out to you on{" "}
+          <strong>{formData.mobile}</strong> shortly.
         </p>
+        <p className="text-foreground/40 text-sm mt-4">
+          Please save your Application ID for future reference.
+        </p>
+        <button
+          onClick={() => {
+            setStatus("idle");
+            setApplicationId("");
+            setFormData({
+              studentName: "",
+              dob: "",
+              gender: "",
+              fatherName: "",
+              motherName: "",
+              classApplying: "",
+              previousSchool: "",
+              mobile: "",
+              alternateMobile: "",
+              email: "",
+              address: "",
+              howHeard: "",
+              referralCode: "",
+              agreedTerms: false,
+            });
+          }}
+          className="mt-8 text-sm text-black underline underline-offset-4 hover:opacity-70 transition-opacity"
+          style={{ fontFamily: "'Inter', Helvetica, Arial, sans-serif" }}
+        >
+          Submit Another Application
+        </button>
       </div>
     );
   }
@@ -250,9 +389,11 @@ export function ApplicationForm() {
       </div>
 
       {status === "error" && (
-        <p className="text-sm text-red-600">
-          Something went wrong: {errorMsg}. Please try again or contact us directly.
-        </p>
+        <div className="bg-red-50 border border-red-200 rounded-md p-4">
+          <p className="text-sm text-red-600">
+            {errorMsg}
+          </p>
+        </div>
       )}
 
       <Button type="submit" className="w-full" disabled={status === "submitting"}>
