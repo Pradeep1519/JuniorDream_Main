@@ -1,0 +1,101 @@
+.stories-page .stories-eyebrow {
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.42);
+}
+
+.stories-hero .stories-eyebrow { color: rgba(255, 255, 255, 0.45); }
+
+.stories-orbit-ring {
+  position: absolute;
+  left: 50%;
+  top: 51%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  pointer-events: none;
+  transform: translate(-50%, -50%) rotate(-12deg);
+}
+
+.stories-orbit-ring-wide { width: 78%; height: 66%; animation: stories-orbit 18s linear infinite; }
+.stories-orbit-ring-tight { width: 49%; height: 43%; animation: stories-orbit 12s linear infinite reverse; }
+
+.stories-story-core {
+  position: absolute;
+  left: 50%;
+  top: 51%;
+  display: flex;
+  width: 150px;
+  height: 150px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 42% 58% 56% 44%;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 55px rgba(255, 255, 255, 0.08);
+  text-align: center;
+  transform: translate(-50%, -50%);
+  animation: stories-core-pulse 5s ease-in-out infinite;
+}
+
+.stories-core-mark { margin-bottom: 8px; color: rgba(255, 255, 255, 0.8); font-size: 28px; }
+
+.stories-orbit-element {
+  position: absolute;
+  display: flex;
+  min-width: 118px;
+  flex-direction: column;
+  gap: 3px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  animation: stories-element-float 4.5s ease-in-out infinite;
+}
+
+.stories-orbit-element small { max-width: 145px; color: rgba(255, 255, 255, 0.4); font-size: 0.64rem; line-height: 1.45; letter-spacing: 0; text-transform: none; }
+.stories-orbit-symbol { color: rgba(255, 255, 255, 0.72); font-size: 1.55rem; line-height: 1; }
+.stories-orbit-curiosity { left: 14%; top: 28%; }
+.stories-orbit-ideas { right: 12%; top: 19%; animation-delay: 700ms; }
+.stories-orbit-create { right: 8%; bottom: 20%; animation-delay: 1.4s; }
+.stories-orbit-confidence { left: 13%; bottom: 17%; animation-delay: 2.1s; }
+.stories-orbit-finale { position: absolute; bottom: 7%; left: 50%; color: rgba(255, 255, 255, 0.48); font-size: 0.7rem; letter-spacing: 0.08em; transform: translateX(-50%); white-space: nowrap; }
+
+.stories-step,
+.stories-card,
+.stories-connection { transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease; }
+.stories-step:hover,
+.stories-card:hover { transform: translateY(-4px); border-color: rgba(0, 0, 0, 0.22); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.06); }
+.stories-connection:hover { transform: translateY(-3px); border-color: rgba(255, 255, 255, 0.35); }
+
+@keyframes stories-orbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes stories-element-float { 0%, 100% { transform: translateY(0); opacity: .72; } 50% { transform: translateY(-7px); opacity: 1; } }
+@keyframes stories-core-pulse { 0%, 100% { border-radius: 42% 58% 56% 44%; transform: translate(-50%, -50%) rotate(-2deg); } 50% { border-radius: 55% 45% 42% 58%; transform: translate(-50%, -52%) rotate(2deg); } }
+
+@media (max-width: 640px) {
+  .stories-hero-visual { min-height: 360px; }
+  .stories-orbit-ring-wide { width: 92%; height: 64%; }
+  .stories-orbit-ring-tight { width: 60%; height: 44%; }
+  .stories-story-core { width: 124px; height: 124px; }
+  .stories-orbit-element { min-width: 92px; font-size: 0.62rem; }
+  .stories-orbit-element small { max-width: 100px; font-size: 0.58rem; }
+  .stories-orbit-curiosity { left: 5%; top: 25%; }
+  .stories-orbit-ideas { right: 3%; top: 17%; }
+  .stories-orbit-create { right: 2%; bottom: 19%; }
+  .stories-orbit-confidence { left: 5%; bottom: 16%; }
+  .stories-orbit-finale { bottom: 5%; font-size: 0.58rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stories-hero-visual::before,
+  .stories-hero-visual::after,
+  .stories-orbit-ring,
+  .stories-orbit-element,
+  .stories-story-core,
+  .stories-step,
+  .stories-card,
+  .stories-connection { animation: none; transition: none; }
+}

@@ -1,0 +1,223 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedInAs(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function validApplication(applicationId, uid) {
+      return request.resource.data.keys().hasAll([
+          'applicationId', 'applicantName', 'studentName', 'userType', 'dob', 'gender',
+          'fatherName', 'motherName', 'stream', 'streamTitle', 'classApplying',
+          'batchLevel', 'tier', 'previousSchool', 'mobile', 'alternateMobile',
+          'email', 'address', 'howHeard', 'referralCode', 'agreedTerms', 'userId',
+          'status', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'applicationId', 'applicantName', 'studentName', 'userType', 'dob', 'gender',
+          'fatherName', 'motherName', 'stream', 'streamTitle', 'classApplying',
+          'batchLevel', 'tier', 'previousSchool', 'mobile', 'alternateMobile',
+          'email', 'address', 'howHeard', 'referralCode', 'agreedTerms', 'userId',
+          'status', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.userId == uid
+        && request.resource.data.applicationId == applicationId
+        && request.resource.data.applicationId is string
+        && request.resource.data.applicationId.size() >= 15
+        && request.resource.data.userType in ['student', 'parent']
+        && request.resource.data.applicantName is string
+        && request.resource.data.applicantName.size() >= 2
+        && request.resource.data.studentName is string
+        && request.resource.data.studentName.size() >= 2
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.mobile.matches('^\\+91[6-9][0-9]{9}$')
+        && request.resource.data.classApplying in ['6', '7', '8', '9', '10', '11', '12']
+        && request.resource.data.agreedTerms == true
+        && request.resource.data.status == 'new'
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time
+        && getAfter(/databases/$(database)/documents/users/$(uid)).data.applicationId
+          == request.resource.data.applicationId;
+    }
+
+    match /applications/{applicationId} {
+      allow get: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow list: if false;
+      allow create: if request.auth != null && validApplication(applicationId, request.auth.uid);
+      allow update, delete: if false;
+    }
+
+    match /users/{uid} {
+      allow get: if signedInAs(uid);
+      allow list: if false;
+      allow create: if signedInAs(uid)
+        && request.resource.data.keys().hasAll([
+          'uid', 'name', 'email', 'mobile', 'userType', 'studentName',
+          'classApplying', 'previousSchool', 'stream', 'batchLevel', 'tier',
+          'applicationId', 'applicationPath', 'applicationStatus', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'uid', 'name', 'email', 'mobile', 'userType', 'studentName',
+          'classApplying', 'previousSchool', 'stream', 'batchLevel', 'tier',
+          'applicationId', 'applicationPath', 'applicationStatus', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.uid == uid
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.userType in ['student', 'parent']
+        && request.resource.data.applicationPath == 'applications/' + request.resource.data.applicationId
+        && request.resource.data.applicationStatus == 'new'
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time
+        && getAfter(/databases/$(database)/documents/applications/$(request.resource.data.applicationId)).data.applicationId
+          == request.resource.data.applicationId;
+      allow update, delete: if false;
+    }
+
+    match /enrollments/{uid} {
+      allow get: if signedInAs(uid);
+      allow list, create, update, delete: if false;
+    }
+
+    match /contact_submissions/{submissionId} {
+      allow create: if request.resource.data.keys().hasAll([
+          'name', 'email', 'mobile', 'userType', 'classLevel', 'interestedIn',
+          'message', 'sourcePage', 'status', 'consentGiven', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'name', 'email', 'mobile', 'userType', 'classLevel', 'interestedIn',
+          'message', 'sourcePage', 'status', 'consentGiven', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 2
+        && request.resource.data.name.size() <= 100
+        && request.resource.data.email is string
+        && request.resource.data.email.size() <= 254
+        && request.resource.data.email.matches('^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')
+        && request.resource.data.mobile.matches('^[6-9][0-9]{9}$')
+        && request.resource.data.userType in ['student', 'parent', 'other']
+        && request.resource.data.classLevel is string
+        && request.resource.data.classLevel.size() <= 20
+        && request.resource.data.interestedIn in ['engineering', 'academic_courses', 'mentorship', 'admissions', 'general']
+        && request.resource.data.message is string
+        && request.resource.data.message.size() >= 10
+        && request.resource.data.message.size() <= 2000
+        && request.resource.data.sourcePage == 'contact'
+        && request.resource.data.status == 'new'
+        && request.resource.data.consentGiven == true
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow read, update, delete: if false;
+    }
+
+    function validInterest(expectedStream) {
+      return request.resource.data.keys().hasAll([
+          'interestId', 'userType', 'applicantName', 'studentName', 'classApplying',
+          'mobile', 'email', 'location', 'stream', 'status', 'agreedTerms', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'interestId', 'userType', 'applicantName', 'studentName', 'classApplying',
+          'mobile', 'email', 'location', 'stream', 'status', 'agreedTerms', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.interestId is string
+        && request.resource.data.stream == expectedStream
+        && request.resource.data.userType in ['student', 'parent']
+        && request.resource.data.applicantName is string
+        && request.resource.data.applicantName.size() >= 2
+        && request.resource.data.applicantName.size() <= 100
+        && request.resource.data.studentName is string
+        && request.resource.data.studentName.size() >= 2
+        && request.resource.data.studentName.size() <= 100
+        && request.resource.data.classApplying in ['6', '7', '8', '9', '10', '11', '12']
+        && request.resource.data.mobile.matches('^\\+91[6-9][0-9]{9}$')
+        && request.resource.data.location is string
+        && request.resource.data.location.size() <= 200
+        && (request.resource.data.email == null || request.resource.data.email is string)
+        && request.resource.data.agreedTerms == true
+        && request.resource.data.status == 'interest_registered'
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+    }
+
+    match /medical_interests/{interestId} {
+      allow create: if validInterest('medical');
+      allow read, update, delete: if false;
+    }
+
+    match /civil_services_interests/{interestId} {
+      allow create: if validInterest('civil-services');
+      allow read, update, delete: if false;
+    }
+
+    match /ai_leads/{leadId} {
+      allow create: if request.resource.data.keys().hasAll([
+          'name', 'email', 'mobile', 'userType', 'parentName', 'childName', 'childClass',
+          'interestedSubjects', 'careerInterest', 'learningGoal', 'currentLevel',
+          'recommendedCourses', 'selectedCourse', 'selectedBatch', 'conversationSummary',
+          'consentGiven', 'status', 'sourcePage', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'name', 'email', 'mobile', 'userType', 'parentName', 'childName', 'childClass',
+          'interestedSubjects', 'careerInterest', 'learningGoal', 'currentLevel',
+          'recommendedCourses', 'selectedCourse', 'selectedBatch', 'conversationSummary',
+          'consentGiven', 'status', 'sourcePage', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.consentGiven == true
+        && request.resource.data.email is string
+        && request.resource.data.email.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$')
+        && request.resource.data.mobile.matches('^[6-9][0-9]{9}$')
+        && request.resource.data.userType in ['student', 'parent', 'unknown']
+        && request.resource.data.name is string
+        && request.resource.data.name.size() <= 100
+        && request.resource.data.conversationSummary is string
+        && request.resource.data.conversationSummary.size() <= 3000
+        && request.resource.data.recommendedCourses is list
+        && request.resource.data.sourcePage is string
+        && request.resource.data.sourcePage.size() <= 200
+        && request.resource.data.status == 'AI Qualified'
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow read, update, delete: if false;
+    }
+
+    match /professional_course_applications/{applicationId} {
+      allow create: if request.resource.data.keys().hasAll([
+          'applicationId', 'userId', 'fullName', 'email', 'mobile', 'city', 'state',
+          'educationLevel', 'college', 'degree', 'graduationYear', 'courseId', 'courseName',
+          'courseCode', 'courseDuration', 'courseFee', 'emiPlan', 'experienceLevel',
+          'technicalExperience', 'careerGoal', 'sourcePage', 'applicationStatus',
+          'paymentStatus', 'paymentOrderId', 'paymentTransactionId', 'paymentAmount',
+          'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'applicationId', 'userId', 'fullName', 'email', 'mobile', 'city', 'state',
+          'educationLevel', 'college', 'degree', 'graduationYear', 'courseId', 'courseName',
+          'courseCode', 'courseDuration', 'courseFee', 'emiPlan', 'experienceLevel',
+          'technicalExperience', 'careerGoal', 'sourcePage', 'applicationStatus',
+          'paymentStatus', 'paymentOrderId', 'paymentTransactionId', 'paymentAmount',
+          'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.applicationId == applicationId
+        && (request.resource.data.userId == null || request.resource.data.userId == request.auth.uid)
+        && request.resource.data.fullName is string && request.resource.data.fullName.size() >= 2
+        && request.resource.data.email is string
+        && request.resource.data.email.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$')
+        && request.resource.data.mobile is string && request.resource.data.mobile.size() >= 6
+        && request.resource.data.courseId is string && request.resource.data.courseId.size() > 0
+        && request.resource.data.courseName is string && request.resource.data.courseName.size() > 0
+        && request.resource.data.applicationStatus == 'new'
+        && request.resource.data.paymentStatus == 'pending'
+        && request.resource.data.paymentOrderId == null
+        && request.resource.data.paymentTransactionId == null
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      // Payment-intent updates only: a client may record that a payment attempt was initiated or
+      // failed, never that it succeeded — real success must come from a verified backend/webhook.
+      allow update: if request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['paymentStatus', 'paymentOrderId', 'paymentTransactionId', 'updatedAt'])
+        && request.resource.data.paymentStatus in ['initiated', 'failed', 'cancelled']
+        && request.resource.data.updatedAt == request.time;
+      allow read, delete: if false;
+    }
+  }
+}

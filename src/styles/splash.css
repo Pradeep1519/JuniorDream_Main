@@ -1,0 +1,78 @@
+/* Intro splash: logo fades in small, grows continuously and smoothly (no
+   stepping), then blows up + fades out revealing the site behind a soft
+   blur transition.
+
+   Scale and opacity are deliberately SEPARATE animations. Scale has only
+   2 keyframes (start -> end) so the easing curve applies once, continuously,
+   across the whole duration — no per-segment deceleration/acceleration
+   "stutter" at intermediate keyframes. Opacity/blur can have more steps
+   since fade timing doesn't read as stuttering the way scale does. */
+
+.jd-splash-overlay {
+  animation: jdSplashOverlayFade 2.4s ease-in forwards;
+}
+
+.jd-splash-logo {
+  animation:
+    jdSplashScale 2.4s cubic-bezier(0.55, 0.06, 0.68, 0.19) forwards,
+    jdSplashLogoOpacity 2.4s linear forwards;
+}
+
+/* Continuous, single-curve zoom — slow at first, accelerating smoothly */
+@keyframes jdSplashScale {
+  0% {
+    transform: scale(0.32);
+  }
+  100% {
+    transform: scale(5.5);
+  }
+}
+
+@keyframes jdSplashLogoOpacity {
+  0% {
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes jdSplashOverlayFade {
+  0% {
+    opacity: 1;
+    background-color: #ffffff;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+  }
+  55% {
+    opacity: 1;
+    background-color: #ffffff;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+  }
+  82% {
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+  100% {
+    opacity: 0;
+    background-color: rgba(255, 255, 255, 0);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jd-splash-overlay,
+  .jd-splash-logo {
+    animation-duration: 0.4s !important;
+  }
+}

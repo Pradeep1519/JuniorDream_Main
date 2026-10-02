@@ -1,0 +1,703 @@
+export interface CoursePhase {
+  title: string;
+  duration: string;
+  topics: string[];
+}
+
+export interface CourseProjectDetail {
+  title: string;
+  description: string;
+}
+
+export interface CourseEmiOption {
+  label: string;
+  months: number;
+  amount: number;
+  perMonthDisplay: string;
+}
+
+export interface CourseFee {
+  amount: number;
+  display: string;
+}
+
+export interface ProfessionalCourse {
+  id: string;
+  slug: string;
+  title: string;
+  category: "Data & AI" | "Software Development" | "Cloud & Security";
+  shortDescription: string;
+  description: string;
+  whoFor: string[];
+  skills: string[];
+  technologies: string[];
+  roadmap: string[];
+  projects: string[];
+  outcomes: string[];
+  accent: string;
+  duration?: string;
+  prerequisites?: string;
+  targetRoles?: string[];
+  phases?: CoursePhase[];
+  projectsDetailed?: CourseProjectDetail[];
+  fee?: CourseFee;
+  emiOptions?: CourseEmiOption[];
+  emiRule?: string;
+}
+
+export const professionalCourses: ProfessionalCourse[] = [
+  {
+    id: "data-science-analytics",
+    slug: "data-science-analytics",
+    title: "Data Science & Analytics",
+    category: "Data & AI",
+    shortDescription: "Turn data into confident business decisions with analytics, Python, SQL, dashboards, and predictive thinking.",
+    description: "This program is built for students and early-career professionals who want to work with real-world data, uncover business insight, and build the analytical confidence needed for modern decision-making roles.",
+    whoFor: [
+      "College students exploring analytics and business intelligence",
+      "Career-switchers looking to move into data-focused roles",
+      "Learners who want stronger problem-solving and business understanding",
+    ],
+    skills: ["Python for data work", "Exploratory analysis", "Metrics and dashboards", "Business understanding"],
+    technologies: ["Python", "Pandas", "NumPy", "SQL", "Power BI", "Excel", "Plotly", "Scikit-learn", "XGBoost", "Streamlit"],
+    roadmap: [
+      "Learn data foundations and business-ready analysis",
+      "Clean and interpret real data with Python and SQL",
+      "Design dashboards and decision frameworks",
+      "Build a complete capstone with business impact",
+    ],
+    projects: ["Executive sales dashboard", "Experimentation and churn case study", "Forecasting decision app"],
+    outcomes: [
+      "Understand how data drives business decisions",
+      "Use modern analytics tools confidently",
+      "Build a portfolio-ready project with measurable insight",
+    ],
+    accent: "#D9EAF5",
+    duration: "8 months",
+    prerequisites: "Basic computer literacy and school-level math are enough. Python, SQL, and statistics are taught from the ground up.",
+    targetRoles: ["Data Analyst", "Business Analyst", "Product Analyst", "Junior Data Scientist"],
+    fee: { amount: 35000, display: "₹35,000" },
+    emiOptions: [
+      { label: "6-Month EMI", months: 6, amount: 5834, perMonthDisplay: "₹5,834/month" },
+      { label: "3-Month Fast Track", months: 3, amount: 11667, perMonthDisplay: "₹11,667/month" },
+    ],
+    emiRule: "EMI closes 2 months before the program ends — the final 2 months are EMI-free.",
+    phases: [
+      {
+        title: "Foundations",
+        duration: "Weeks 1–6",
+        topics: [
+          "Python for data: functions, loops, OOP basics, file handling, and data structures",
+          "NumPy & Pandas deep dive: filtering, grouping, merging, pivoting, and time-series handling",
+          "SQL from analyst to advanced: joins, CTEs, window functions, subqueries, and query optimization",
+          "Statistics & probability: distributions, sampling, confidence intervals, and hypothesis testing",
+          "Excel & Power Query essentials for business users",
+        ],
+      },
+      {
+        title: "Analytics & Business Insight",
+        duration: "Weeks 7–12",
+        topics: [
+          "Data cleaning and EDA: missing values, outliers, profiling, and validation",
+          "Visualization and storytelling: Power BI, dashboard design, metrics, and KPI trees",
+          "Business analytics: funnels, retention, cohort analysis, and product thinking",
+          "Experimentation: A/B testing, sample sizing, and causal framing",
+          "Domain case studies: e-commerce, fintech, EdTech, and healthcare",
+        ],
+      },
+      {
+        title: "Predictive Modeling",
+        duration: "Weeks 13–19",
+        topics: [
+          "Regression and classification: logistic regression, decision trees, and model basics",
+          "Ensemble methods: Random Forest, XGBoost, and model comparison",
+          "Model evaluation: cross-validation, ROC-AUC, calibration, and precision-recall",
+          "Feature engineering, pipelines, and hyperparameter tuning",
+          "Time-series forecasting and segmentation basics",
+          "Explainable ML: SHAP, feature importance, and better stakeholder communication",
+        ],
+      },
+      {
+        title: "Industry & Deployment",
+        duration: "Weeks 20–26",
+        topics: [
+          "Data warehouse and cloud basics: Snowflake, BigQuery, and data pipelines",
+          "MLflow and Streamlit deployment workflows",
+          "GenAI support for analysis: LLM-assisted EDA and reporting workflows",
+          "Data governance, privacy, and ethics",
+          "Capstone presentation, portfolio building, and interview preparation",
+        ],
+      },
+    ],
+    projectsDetailed: [
+      { title: "End-to-end business dashboard", description: "Build a sales and customer performance dashboard from raw data into a polished KPI story for business leaders." },
+      { title: "Experimentation + churn analysis", description: "Design an A/B testing plan, calculate outcomes, and explain results with clear business framing." },
+      { title: "Capstone — forecasting and decision app", description: "Create a decision-support app backed by forecasting logic and deployment-ready reporting." },
+    ],
+  },
+  {
+    id: "ai-machine-learning",
+    slug: "ai-machine-learning",
+    title: "AI & Machine Learning",
+    category: "Data & AI",
+    shortDescription: "Go from model curiosity to real-world AI problem solving with practical machine learning workflows.",
+    description: "This track helps learners move from AI interest to implementation by understanding algorithms, evaluation methods, and how real systems are built, tuned, and applied.",
+    whoFor: [
+      "Students exploring AI and ML careers",
+      "Learners who want strong technical fundamentals",
+      "Anyone interested in building data-driven intelligent systems",
+    ],
+    skills: ["Model thinking", "Feature engineering", "Evaluation metrics", "Applied ML pipelines"],
+    technologies: ["Python", "Scikit-learn", "NumPy", "Pandas", "PyTorch", "Jupyter", "MLflow", "Docker", "FastAPI"],
+    roadmap: [
+      "Build strong math and data foundations",
+      "Train classical ML models on real data",
+      "Understand deep learning and model optimization",
+      "Ship an AI project from start to deployment",
+    ],
+    projects: ["Risk prediction model", "Customer classification workflow", "Production ML app"],
+    outcomes: [
+      "Understand how ML systems learn and improve",
+      "Apply AI to real business and technical problems",
+      "Create a portfolio-ready machine learning project",
+    ],
+    accent: "#E7D9F8",
+    duration: "6 months",
+    prerequisites: "Python basics and a strong interest in logic and problem solving. A bridge module is included for learners who need it.",
+    targetRoles: ["ML Engineer", "AI Engineer", "Applied Scientist", "Computer Vision / NLP Engineer"],
+    fee: { amount: 42000, display: "₹42,000" },
+    emiOptions: [
+      { label: "6-Month EMI", months: 6, amount: 7000, perMonthDisplay: "₹7,000/month" },
+      { label: "3-Month Fast Track", months: 3, amount: 14000, perMonthDisplay: "₹14,000/month" },
+    ],
+    emiRule: "EMI closes 2 months before the program ends — the final 2 months are EMI-free.",
+    phases: [
+      {
+        title: "Math & Python for ML",
+        duration: "Weeks 1–5",
+        topics: [
+          "Vectors, matrices, probability, optimization, and model intuition",
+          "Python scientific stack and data handling",
+          "Train/validation/test strategy and real-world data leakage prevention",
+        ],
+      },
+      {
+        title: "Classical Machine Learning",
+        duration: "Weeks 6–12",
+        topics: [
+          "Linear models, decision trees, SVM, k-NN, and ensemble methods",
+          "Feature engineering, hyperparameter tuning, and evaluation",
+          "Clustering and unsupervised learning fundamentals",
+        ],
+      },
+      {
+        title: "Deep Learning",
+        duration: "Weeks 13–20",
+        topics: [
+          "Neural network basics and deep learning workflows",
+          "PyTorch training loops, CNNs, and transfer learning",
+          "NLP with embeddings and transformer concepts",
+        ],
+      },
+      {
+        title: "Production AI",
+        duration: "Weeks 21–26",
+        topics: [
+          "Model deployment, monitoring, and responsible AI",
+          "Experiment tracking and evaluation at scale",
+          "Deployment patterns for real product use cases",
+        ],
+      },
+    ],
+    projectsDetailed: [
+      { title: "Customer intelligence model", description: "Build a predictive model using real-world tabular or behavioral data, then interpret it for business decision-making." },
+      { title: "Vision or NLP project", description: "Train a model for a specific problem domain and evaluate it with proper metrics and trade-offs." },
+      { title: "Capstone — deployable ML solution", description: "Package your model into a real app workflow with deployment, monitoring, and a strategic explanation." },
+    ],
+  },
+  {
+    id: "generative-ai-agents",
+    slug: "generative-ai-agents",
+    title: "Generative AI & Agents",
+    category: "Data & AI",
+    shortDescription: "Learn how to design, evaluate, and deploy LLM workflows, copilots, and agent-based systems.",
+    description: "This track introduces the practical world of generative AI, from prompting and retrieval to agents, orchestration, and production safety. It is designed for learners who want to build AI-powered applications instead of only reading about them.",
+    whoFor: [
+      "Students interested in AI product building",
+      "Builders wanting to create LLM workflows and tools",
+      "Professionals exploring AI automation and system design",
+    ],
+    skills: ["Prompt design", "RAG architecture", "Agent orchestration", "AI evaluation and safety"],
+    technologies: ["OpenAI APIs", "LangChain", "LangGraph", "LlamaIndex", "MCP", "Vector DBs", "Python", "Ollama"],
+    roadmap: [
+      "Understand LLM foundations and prompting",
+      "Build retrieval and knowledge systems",
+      "Design agent-driven workflows and tool use",
+      "Evaluate, secure, and deploy real AI systems",
+    ],
+    projects: ["Knowledge assistant", "Document Q&A workflow", "Agentic task automation app"],
+    outcomes: [
+      "Use LLMs in a practical and responsible way",
+      "Design AI workflows and assistants for real tasks",
+      "Prototype AI-powered tools with product thinking",
+    ],
+    accent: "#F7E9C7",
+    duration: "6 months",
+    prerequisites: "Python basics are helpful, and a bridge module is included for learners who are new to AI tooling.",
+    targetRoles: ["GenAI Engineer", "AI Application Developer", "LLM Engineer", "AI Automation Engineer"],
+    fee: { amount: 45000, display: "₹45,000" },
+    emiOptions: [
+      { label: "6-Month EMI", months: 6, amount: 7500, perMonthDisplay: "₹7,500/month" },
+      { label: "3-Month Fast Track", months: 3, amount: 15000, perMonthDisplay: "₹15,000/month" },
+    ],
+    emiRule: "EMI closes 2 months before the program ends — the final 2 months are EMI-free.",
+    phases: [
+      {
+        title: "LLM Foundations",
+        duration: "Weeks 1–5",
+        topics: [
+          "How transformers work and how context influences output",
+          "Prompt design, context engineering, structured outputs, and tools",
+          "API usage, model selection, limits, and evaluation basics",
+        ],
+      },
+      {
+        title: "RAG & Knowledge Systems",
+        duration: "Weeks 6–12",
+        topics: [
+          "Embeddings, vector search, chunking, and retrieval design",
+          "RAG pipelines for real documents and enterprise knowledge",
+          "Evaluation of quality, faithfulness, and answer accuracy",
+        ],
+      },
+      {
+        title: "Agents & Orchestration",
+        duration: "Weeks 13–20",
+        topics: [
+          "ReAct patterns, tool calling, memory, and workflow orchestration",
+          "LangGraph, multi-step agent design, and human-in-the-loop flows",
+          "MCP and tool ecosystems for real product use cases",
+        ],
+      },
+      {
+        title: "Production & Safety",
+        duration: "Weeks 21–26",
+        topics: [
+          "LLM evaluation, observability, guardrails, and safe deployment",
+          "Cost control, latency awareness, and governance",
+          "Product UX for AI experiences and fallback design",
+        ],
+      },
+    ],
+    projectsDetailed: [
+      { title: "AI study assistant", description: "Build a contextual assistant that answers questions using personal notes, documents, and structured knowledge sources." },
+      { title: "RAG-based enterprise workflow", description: "Create a useful knowledge retrieval system with citations, eval checks, and iterative improvement loops." },
+      { title: "Capstone — agent platform", description: "Design a multi-step AI business workflow with tools, guardrails, and a live deployment prototype." },
+    ],
+  },
+  {
+    id: "full-stack-web-development",
+    slug: "full-stack-web-development",
+    title: "Full Stack Web Development",
+    category: "Software Development",
+    shortDescription: "Build complete digital products from interface to server, database, and deployment.",
+    description: "This course is designed for learners who want to create real web products end-to-end: from the front end users see to the backend logic and the systems that make it work at scale.",
+    whoFor: [
+      "College students targeting software careers",
+      "Career switchers entering product development",
+      "Builders who want full ownership of web products",
+    ],
+    skills: ["Frontend development", "Backend APIs", "Database thinking", "Deployment fundamentals"],
+    technologies: ["React", "Node.js", "Express", "MongoDB", "PostgreSQL", "Git", "REST APIs"],
+    roadmap: [
+      "Understand frontend fundamentals and user flows",
+      "Build backend systems and API architecture",
+      "Connect data models and application logic",
+      "Deploy and iterate on a complete product",
+    ],
+    projects: ["Learning platform UI", "Storefront application", "Full-stack product prototype"],
+    outcomes: [
+      "Create polished web experiences with real functionality",
+      "Build products from concept to launch",
+      "Develop practical product engineering skills",
+    ],
+    accent: "#DDE7F9",
+    duration: "6 months",
+    prerequisites: "No advanced coding experience is required. Basic digital literacy and a willingness to build are enough.",
+    targetRoles: ["Frontend Developer", "Backend Developer", "Full Stack Developer", "Product Engineer"],
+    fee: { amount: 36000, display: "₹36,000" },
+    emiOptions: [
+      { label: "6-Month EMI", months: 6, amount: 6000, perMonthDisplay: "₹6,000/month" },
+      { label: "3-Month Fast Track", months: 3, amount: 12000, perMonthDisplay: "₹12,000/month" },
+    ],
+    emiRule: "EMI closes 2 months before the program ends — the final 2 months are EMI-free.",
+    phases: [
+      {
+        title: "Web Foundations",
+        duration: "Weeks 1–5",
+        topics: [
+          "HTML, CSS, responsive design, and user experience fundamentals",
+          "JavaScript and modern frontend development patterns",
+          "Git, UI thinking, and build workflows",
+        ],
+      },
+      {
+        title: "Frontend Product Building",
+        duration: "Weeks 6–12",
+        topics: [
+          "React components, state, routing, forms, and UI architecture",
+          "Modern frontend patterns for real product problems",
+          "Data flow, UX consistency, and product behavior",
+        ],
+      },
+      {
+        title: "Backend & Database",
+        duration: "Weeks 13–20",
+        topics: [
+          "Node.js, REST APIs, authentication, and validation",
+          "MongoDB and PostgreSQL with real data modeling",
+          "System design for product features and performance",
+        ],
+      },
+      {
+        title: "Deployment & Delivery",
+        duration: "Weeks 21–26",
+        topics: [
+          "Production deployment, environment setup, and debugging",
+          "API integration, performance improvements, and maintenance",
+          "Portfolio polish and product demo preparation",
+        ],
+      },
+    ],
+    projectsDetailed: [
+      { title: "Learning platform UI", description: "Create a product experience for course discovery, enrollment, and progress tracking with a clean frontend and real logic." },
+      { title: "Marketplace or dashboard app", description: "Build a complete product prototype using frontend, backend, and data storage together." },
+      { title: "Capstone product launch", description: "Deliver a complete web product with deployment-ready architecture and a polished portfolio story." },
+    ],
+  },
+  {
+    id: "cloud-engineering",
+    slug: "cloud-engineering",
+    title: "Cloud Engineering",
+    category: "Cloud & Security",
+    shortDescription: "Learn how reliable systems are built, automated, and scaled in modern cloud environments.",
+    description: "This track helps learners understand cloud-native architecture, deployment automation, and operational thinking behind systems that scale smoothly and remain reliable.",
+    whoFor: [
+      "Learners interested in infrastructure and DevOps",
+      "Students exploring cloud-native engineering",
+      "Builders who want strong deployment and system fundamentals",
+    ],
+    skills: ["Cloud architecture", "Automation", "System reliability", "Infrastructure thinking"],
+    technologies: ["AWS", "Azure", "Linux", "Docker", "CI/CD", "Networking"],
+    roadmap: [
+      "Understand cloud basics and system architecture",
+      "Learn compute, networking, storage, and security services",
+      "Work with containers and automation pipelines",
+      "Build deployment-ready infrastructure and operational habits",
+    ],
+    projects: ["Deployment pipeline setup", "Cloud application launch", "Infrastructure configuration project"],
+    outcomes: [
+      "Understand how cloud systems are designed and operated",
+      "Build practical deployment workflows and automation habits",
+      "Think like a modern platform or cloud engineer",
+    ],
+    accent: "#DCE8E0",
+    duration: "5 months",
+    prerequisites: "Comfort with basic computer systems and willingness to learn operations, automation, and networking concepts.",
+    targetRoles: ["Cloud Engineer", "DevOps Engineer", "Platform Engineer", "Infrastructure Analyst"],
+    fee: { amount: 32000, display: "₹32,000" },
+    emiOptions: [
+      { label: "6-Month EMI", months: 6, amount: 5334, perMonthDisplay: "₹5,334/month" },
+      { label: "3-Month Fast Track", months: 3, amount: 10667, perMonthDisplay: "₹10,667/month" },
+    ],
+    emiRule: "EMI closes 2 months before the program ends — the final 2 months are EMI-free.",
+    phases: [
+      {
+        title: "Core Cloud Fundamentals",
+        duration: "Weeks 1–5",
+        topics: [
+          "Cloud models, compute, storage, networking, and service types",
+          "Identity, access control, and safety basics",
+          "Linux and command-line workflows for infrastructure work",
+        ],
+      },
+      {
+        title: "Containers & Automation",
+        duration: "Weeks 6–12",
+        topics: [
+          "Docker, container concepts, and environment management",
+          "CI/CD pipelines and release automation",
+          "Infrastructure as code and repeatable deployment patterns",
+        ],
+      },
+      {
+        title: "Production Operations",
+        duration: "Weeks 13–18",
+        topics: [
+          "Monitoring, logging, reliability, and deployment safety",
+          "Auto-scaling, performance tuning, and cost awareness",
+          "System design for real workloads and uptime",
+        ],
+      },
+      {
+        title: "Capstone Execution",
+        duration: "Weeks 19–22",
+        topics: [
+          "Deploy a production-like app in the cloud",
+          "Set up automation, monitoring, and documentation",
+          "Present operational decisions and architecture choices",
+        ],
+      },
+    ],
+    projectsDetailed: [
+      { title: "Cloud app deployment pipeline", description: "Set up a deployable application environment using cloud services, container workflows, and automation." },
+      { title: "Resilient stack project", description: "Build and document a production-ready architecture with clear reliability and scaling decisions." },
+      { title: "Capstone — cloud operations case", description: "Deploy a real workload, manage performance, and explain how it stays secure and operational." },
+    ],
+  },
+  {
+    id: "dotnet-azure",
+    slug: "dotnet-azure",
+    title: ".NET & Azure",
+    category: "Software Development",
+    shortDescription: "Build enterprise-ready products with the .NET ecosystem and Azure deployment workflows.",
+    description: "This course is ideal for learners interested in enterprise software and Microsoft technologies, combining backend engineering with cloud deployment awareness and modern application thinking.",
+    whoFor: [
+      "Students exploring enterprise software and Microsoft tools",
+      "Learners wanting practical cloud-enabled development experience",
+      "Builders interested in backend and application architecture",
+    ],
+    skills: ["C# fundamentals", "Application design", "Web APIs", "Azure deployment"],
+    technologies: ["C#", ".NET", "ASP.NET", "Azure", "SQL", "REST APIs"],
+    roadmap: [
+      "Learn the .NET ecosystem and application structure",
+      "Build APIs and business logic for modern apps",
+      "Connect to data and deploy in a cloud context",
+      "Create an enterprise-ready product demo",
+    ],
+    projects: ["Enterprise API project", "Azure-hosted app", "Business workflow demo"],
+    outcomes: [
+      "Understand enterprise application patterns",
+      "Use modern Microsoft development tools confidently",
+      "Build and deploy a solution with cloud awareness",
+    ],
+    accent: "#D8E2F7",
+    duration: "5 months",
+    prerequisites: "No prior .NET experience is necessary. Basic programming understanding helps, but the curriculum is beginner-friendly.",
+    targetRoles: ["Backend Developer", ".NET Developer", "Application Developer", "Cloud Application Engineer"],
+    fee: { amount: 34000, display: "₹34,000" },
+    emiOptions: [
+      { label: "6-Month EMI", months: 6, amount: 5667, perMonthDisplay: "₹5,667/month" },
+      { label: "3-Month Fast Track", months: 3, amount: 11333, perMonthDisplay: "₹11,333/month" },
+    ],
+    emiRule: "EMI closes 2 months before the program ends — the final 2 months are EMI-free.",
+    phases: [
+      {
+        title: "C# & .NET Foundations",
+        duration: "Weeks 1–5",
+        topics: [
+          "C# syntax, OOP, collections, error handling, and clean code habits",
+          "Understanding the .NET development environment and project structure",
+          "Core application design patterns for business logic",
+        ],
+      },
+      {
+        title: "Web APIs & Data",
+        duration: "Weeks 6–12",
+        topics: [
+          "API design, routing, validation, and service architecture",
+          "Database access, business modeling, and application flow",
+          "Secure, maintainable backend patterns",
+        ],
+      },
+      {
+        title: "Azure & Deployment",
+        duration: "Weeks 13–18",
+        topics: [
+          "Azure services, deployment architecture, and environment setup",
+          "CI/CD basics and production-ready hosting choices",
+          "Monitoring and real-world operational awareness",
+        ],
+      },
+      {
+        title: "Capstone Delivery",
+        duration: "Weeks 19–22",
+        topics: [
+          "End-to-end app build with Azure deployment",
+          "Product documentation and project presentation",
+          "Portfolio-ready case study and discussion",
+        ],
+      },
+    ],
+    projectsDetailed: [
+      { title: "Enterprise backend API", description: "Design and build a business-focused application API with real data handling and service design." },
+      { title: "Azure-hosted web app", description: "Deploy a web application to Azure and explain how the architecture supports reliability and scale." },
+      { title: "Capstone — business workflow app", description: "Create a polished application that solves a realistic business problem with proper architecture and deployment." },
+    ],
+  },
+  {
+    id: "software-engineering",
+    slug: "software-engineering",
+    title: "Software Engineering",
+    category: "Software Development",
+    shortDescription: "Strengthen the fundamentals behind clean code, problem solving, and system thinking.",
+    description: "This program helps learners understand how strong software engineering habits are built: through problem decomposition, system thinking, clean architecture, and practical decision-making.",
+    whoFor: [
+      "Students exploring software careers",
+      "Career switchers looking for stronger technical fundamentals",
+      "Developers who want sharper engineering skills",
+    ],
+    skills: ["Problem decomposition", "System design basics", "Code quality", "Product thinking"],
+    technologies: ["Algorithms", "Data structures", "Git", "Testing", "System design"],
+    roadmap: [
+      "Develop clean coding and problem-solving habits",
+      "Understand system trade-offs and structure",
+      "Learn architecture patterns and project decision-making",
+      "Create a portfolio-ready engineering case study",
+    ],
+    projects: ["Algorithmic challenge set", "System design exercise", "Application architecture case"],
+    outcomes: [
+      "Write cleaner, more maintainable code",
+      "Reason clearly about system trade-offs",
+      "Develop stronger engineering instincts and clarity",
+    ],
+    accent: "#F4E3B8",
+    duration: "4 months",
+    prerequisites: "Some coding familiarity is helpful, but the course focuses on building strong fundamentals from the ground up.",
+    targetRoles: ["Software Engineer", "Product Engineer", "Junior Engineer", "Backend/Frontend Engineer"],
+    fee: { amount: 26000, display: "₹26,000" },
+    emiOptions: [
+      { label: "6-Month EMI", months: 6, amount: 4334, perMonthDisplay: "₹4,334/month" },
+      { label: "3-Month Fast Track", months: 3, amount: 8667, perMonthDisplay: "₹8,667/month" },
+    ],
+    emiRule: "EMI closes 2 months before the program ends — the final 2 months are EMI-free.",
+    phases: [
+      {
+        title: "Problem Solving",
+        duration: "Weeks 1–5",
+        topics: [
+          "Data structures, algorithmic thinking, and clean logic",
+          "Breaking problems into step-by-step solutions",
+          "Debugging and practical coding patterns",
+        ],
+      },
+      {
+        title: "Engineering Fundamentals",
+        duration: "Weeks 6–10",
+        topics: [
+          "Writing maintainable code, testing habits, and refactoring",
+          "Architecture basics and trade-off analysis",
+          "Designing better systems from the start",
+        ],
+      },
+      {
+        title: "System Thinking",
+        duration: "Weeks 11–16",
+        topics: [
+          "System boundaries, scalability, and technical decisions",
+          "Common design patterns and trade-offs",
+          "Product thinking in engineering work",
+        ],
+      },
+      {
+        title: "Capstone Reflection",
+        duration: "Weeks 17–18",
+        topics: [
+          "Applying engineering decisions to a real product case",
+          "Making choices, justifying them, and presenting the result",
+        ],
+      },
+    ],
+    projectsDetailed: [
+      { title: "Structured problem set", description: "Solve technical challenges with clear reasoning, efficient logic, and good abstraction choices." },
+      { title: "System design exercise", description: "Design a practical system and explain trade-offs around scale, reliability, and complexity." },
+      { title: "Capstone — engineering rationale", description: "Present a solution backed by sound technical decisions and strong product awareness." },
+    ],
+  },
+  {
+    id: "qa-automation-testing",
+    slug: "qa-automation-testing",
+    title: "QA & Automation Testing",
+    category: "Software Development",
+    shortDescription: "Learn how modern software quality is designed, tested, and improved through automation and analysis.",
+    description: "This program introduces learners to software testing as a core engineering discipline. It blends manual quality thinking, automation workflows, and real-world product validation to help students build confidence in delivering reliable software.",
+    whoFor: [
+      "Students looking at QA and testing careers",
+      "Builders who want better product quality habits",
+      "Professionals interested in software reliability and automation",
+    ],
+    skills: ["Manual testing", "Test design", "Automation scripting", "Quality thinking"],
+    technologies: ["Selenium", "Playwright", "JavaScript", "TestNG", "API testing", "Git"],
+    roadmap: [
+      "Learn testing fundamentals and why quality matters",
+      "Build manual test strategies and validation habits",
+      "Automate workflows for web and API testing",
+      "Create a QA-ready project and quality report",
+    ],
+    projects: ["Web app quality checklist", "Automation suite", "Bug reporting and validation project"],
+    outcomes: [
+      "Understand how software quality is designed and verified",
+      "Use modern testing workflows and automation tools",
+      "Improve reliability in product delivery and release work",
+    ],
+    accent: "#F0D7D0",
+    duration: "4 months",
+    prerequisites: "Basic software familiarity is enough. The curriculum is beginner-friendly and practical.",
+    targetRoles: ["QA Engineer", "Automation Tester", "Manual Tester", "Product Quality Analyst"],
+    fee: { amount: 22000, display: "₹22,000" },
+    emiOptions: [
+      { label: "6-Month EMI", months: 6, amount: 3667, perMonthDisplay: "₹3,667/month" },
+      { label: "3-Month Fast Track", months: 3, amount: 7334, perMonthDisplay: "₹7,334/month" },
+    ],
+    emiRule: "EMI closes 2 months before the program ends — the final 2 months are EMI-free.",
+    phases: [
+      {
+        title: "Quality Foundations",
+        duration: "Weeks 1–5",
+        topics: [
+          "What quality means in product work and why testing matters",
+          "Testing lifecycle, bug categories, and validation thinking",
+          "Writing test cases and understanding edge cases",
+        ],
+      },
+      {
+        title: "Manual & API Testing",
+        duration: "Weeks 6–10",
+        topics: [
+          "Functional testing, regression thinking, and requirement validation",
+          "API testing basics, request/response flows, and validation checks",
+          "Real-world QA reporting and defect tracking",
+        ],
+      },
+      {
+        title: "Automation Testing",
+        duration: "Weeks 11–16",
+        topics: [
+          "Playwright/Selenium fundamentals and browser automation",
+          "Automation frameworks and test reliability",
+          "Assertions, scripts, and reusable test design",
+        ],
+      },
+      {
+        title: "Capstone QA Project",
+        duration: "Weeks 17–18",
+        topics: [
+          "Apply testing strategy to a full app workflow",
+          "Report bugs, reinforce test coverage, and present the final quality story",
+        ],
+      },
+    ],
+    projectsDetailed: [
+      { title: "Functional test plan", description: "Create a structured quality workflow for a real user journey and report key risks, edge cases, and validations." },
+      { title: "Automation test suite", description: "Design practical browser and API automation checks that improve product confidence and reduce manual bottlenecks." },
+      { title: "Capstone — QA report", description: "Deliver a full quality analysis for a product scenario, showing test coverage, defect handling, and reliability thinking." },
+    ],
+  },
+];
+
+export function getProfessionalCourseBySlug(slug: string) {
+  if (slug === "data-analyst") {
+    return professionalCourses.find((course) => course.slug === "data-science-analytics") ?? null;
+  }
+  return professionalCourses.find((course) => course.slug === slug) ?? null;
+}

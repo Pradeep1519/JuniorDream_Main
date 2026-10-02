@@ -1,0 +1,518 @@
+/* Professional Courses hero — Apple/iOS-inspired premium identity: SF Pro type, soft aurora light, glass surfaces. */
+
+.jd-pro-hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  min-height: 100svh;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  background: #000000;
+  color: #f5f5f7;
+  padding: 7rem 1.25rem 2.5rem;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif;
+}
+
+@media (min-width: 768px) {
+  .jd-pro-hero { padding: 8.5rem 3rem 3rem; }
+}
+
+@media (min-width: 1280px) {
+  .jd-pro-hero { padding: 9.5rem 5rem 3.25rem; }
+}
+
+/* ---- Background: deep black canvas with soft, slow-drifting aurora light (Apple product-page style) ---- */
+.jd-pro-hero__bg {
+  position: absolute;
+  inset: -6% -6%;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 1.6s cubic-bezier(0.28, 0.11, 0.32, 1);
+  will-change: transform;
+}
+
+.jd-pro-hero__bg.is-visible {
+  opacity: 1;
+}
+
+.jd-pro-hero__grid {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255, 255, 255, 0.05), transparent 70%);
+}
+
+.jd-pro-hero__glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(60% 50% at 50% 100%, rgba(10, 10, 12, 0.9), transparent 70%);
+}
+
+.jd-pro-hero__aurora {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  filter: blur(80px);
+  opacity: 0.8;
+}
+
+.jd-pro-hero__aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  animation: jd-pro-aurora-drift 18s ease-in-out infinite;
+}
+
+.jd-pro-hero__aurora-blob--one {
+  top: -10%;
+  left: 8%;
+  width: 46vw;
+  height: 46vw;
+  max-width: 620px;
+  max-height: 620px;
+  background: radial-gradient(circle, rgba(94, 150, 255, 0.55), transparent 70%);
+}
+
+.jd-pro-hero__aurora-blob--two {
+  bottom: -18%;
+  right: 4%;
+  width: 40vw;
+  height: 40vw;
+  max-width: 560px;
+  max-height: 560px;
+  background: radial-gradient(circle, rgba(224, 90, 43, 0.4), transparent 70%);
+  animation-delay: -6s;
+}
+
+.jd-pro-hero__aurora-blob--three {
+  top: 30%;
+  left: 42%;
+  width: 30vw;
+  height: 30vw;
+  max-width: 420px;
+  max-height: 420px;
+  background: radial-gradient(circle, rgba(170, 130, 255, 0.3), transparent 72%);
+  animation-delay: -11s;
+}
+
+@keyframes jd-pro-aurora-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(3%, -4%, 0) scale(1.08); }
+}
+
+.jd-pro-hero__sheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.05) 48%, transparent 62%);
+  opacity: 0.6;
+}
+
+.jd-pro-hero__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.55) 60%, rgba(0, 0, 0, 0.92) 100%);
+}
+
+/* ---- Content ---- */
+.jd-pro-hero__main {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(1.5rem, 4vw, 4rem);
+}
+
+.jd-pro-hero__content {
+  max-width: 880px;
+}
+
+/* ---- Spotlight panel: real, rotating course content fills the right-side space ---- */
+.jd-pro-hero__trust {
+  flex: none;
+  width: min(380px, 32vw);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  padding: 1.75rem;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset, 0 24px 70px rgba(0, 0, 0, 0.4);
+}
+
+.jd-pro-hero__trust-eyebrow {
+  margin: 0 0 1.1rem;
+  color: rgba(245, 245, 247, 0.5);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.jd-pro-hero__spotlight {
+  min-height: 190px;
+  animation: jd-pro-spotlight-in 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes jd-pro-spotlight-in {
+  from { opacity: 0; filter: blur(4px); transform: translateY(8px) scale(0.99); }
+  to { opacity: 1; filter: blur(0); transform: translateY(0) scale(1); }
+}
+
+.jd-pro-hero__spotlight-title {
+  margin: 0;
+  color: #f5f5f7;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+}
+
+.jd-pro-hero__spotlight-desc {
+  margin: 0.65rem 0 0;
+  color: rgba(245, 245, 247, 0.65);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+.jd-pro-hero__spotlight-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.jd-pro-hero__spotlight-chip {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  color: rgba(245, 245, 247, 0.75);
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.jd-pro-hero__spotlight-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1.1rem;
+  color: #e68a5f;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: gap 0.25s ease, color 0.25s ease;
+}
+
+.jd-pro-hero__spotlight-link:hover {
+  gap: 0.6rem;
+  color: #f0996a;
+}
+
+.jd-pro-hero__spotlight-dots {
+  display: flex;
+  gap: 0.4rem;
+  margin: 1.25rem 0 0;
+}
+
+.jd-pro-hero__spotlight-dot {
+  appearance: none;
+  width: 18px;
+  height: 4px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.3s ease, width 0.3s ease;
+}
+
+.jd-pro-hero__spotlight-dot.is-active {
+  width: 28px;
+  background: #e05a2b;
+}
+
+.jd-pro-hero__spotlight-dot:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.jd-pro-hero__trust-mini {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  margin: 1.35rem 0 0;
+  padding-top: 1.1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  list-style: none;
+}
+
+.jd-pro-hero__trust-mini-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: rgba(245, 245, 247, 0.7);
+  font-size: 0.74rem;
+  font-weight: 500;
+}
+
+.jd-pro-hero__trust-mini-item svg {
+  flex: none;
+  color: #e68a5f;
+}
+
+@media (max-width: 1100px) {
+  .jd-pro-hero__trust {
+    display: none;
+  }
+}
+
+.jd-pro-hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 0 1.25rem;
+  color: rgba(245, 245, 247, 0.65);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.jd-pro-hero__eyebrow-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #e05a2b;
+  box-shadow: 0 0 12px 2px rgba(224, 90, 43, 0.6);
+}
+
+.jd-pro-hero__headline {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
+  font-size: clamp(2.8rem, 7vw, 5.75rem);
+  font-weight: 600;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+}
+
+.jd-pro-hero__line-mask {
+  display: block;
+  overflow: hidden;
+}
+
+.jd-pro-hero__line {
+  display: block;
+}
+
+.jd-pro-hero__sub {
+  margin: 1.5rem 0 0;
+  max-width: 44ch;
+  color: rgba(245, 245, 247, 0.72);
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.6;
+}
+
+.jd-pro-hero__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+
+.jd-pro-hero__cta-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 980px;
+  background: #e05a2b;
+  padding: 0.85rem 1.75rem;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  text-decoration: none;
+  text-transform: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 30px rgba(224, 90, 43, 0.25);
+  transition: transform 0.4s cubic-bezier(0.28, 0.11, 0.32, 1), box-shadow 0.4s cubic-bezier(0.28, 0.11, 0.32, 1), background 0.3s ease;
+}
+
+.jd-pro-hero__cta-primary:hover {
+  background: #ec6a3c;
+  transform: translateY(-1px) scale(1.015);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 14px 36px rgba(224, 90, 43, 0.35);
+}
+
+.jd-pro-hero__cta-arrow {
+  transition: transform 0.4s cubic-bezier(0.28, 0.11, 0.32, 1);
+}
+
+.jd-pro-hero__cta-primary:hover .jd-pro-hero__cta-arrow {
+  transform: translateX(4px);
+}
+
+.jd-pro-hero__cta-secondary {
+  appearance: none;
+  border-radius: 980px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  padding: 0.85rem 1.75rem;
+  color: #f5f5f7;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  text-transform: none;
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.28, 0.11, 0.32, 1), background 0.3s ease, border-color 0.3s ease;
+}
+
+.jd-pro-hero__cta-secondary:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* ---- Category strip ---- */
+.jd-pro-hero__strip {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-top: 3.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  padding-top: 1.25rem;
+}
+
+.jd-pro-hero__strip-label {
+  flex: none;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.jd-pro-hero__strip-track {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+}
+
+.jd-pro-hero__strip-row {
+  display: flex;
+  width: max-content;
+  gap: 0.75rem;
+  animation: jd-pro-strip-scroll 22s linear infinite;
+}
+
+.jd-pro-hero__strip-row:hover,
+.jd-pro-hero__strip-row:focus-within {
+  animation-play-state: paused;
+}
+
+@keyframes jd-pro-strip-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.jd-pro-hero__strip-item {
+  flex: none;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  padding: 0.55rem 1.2rem;
+  color: rgba(245, 245, 247, 0.75);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  text-decoration: none;
+  text-transform: none;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.jd-pro-hero__strip-item:hover,
+.jd-pro-hero__strip-item:focus-visible {
+  border-color: rgba(224, 90, 43, 0.55);
+  background: rgba(224, 90, 43, 0.14);
+  color: #ffffff;
+}
+
+.jd-pro-hero__scroll-indicator {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  animation: jd-pro-bounce 2.2s ease-in-out infinite;
+}
+
+.jd-pro-hero__scroll-indicator:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #ffffff;
+}
+
+@keyframes jd-pro-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
+/* ---- Entrance reveal ---- */
+.jd-pro-reveal {
+  opacity: 0;
+  filter: blur(6px);
+  transform: translateY(18px) scale(0.99);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), filter 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.jd-pro-reveal.is-in {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0) scale(1);
+}
+
+/* ---- Small screens ---- */
+@media (max-width: 480px) {
+  .jd-pro-hero__ctas { gap: 0.9rem; }
+  .jd-pro-hero__cta-primary,
+  .jd-pro-hero__cta-secondary { padding: 0.85rem 1.3rem; font-size: 0.72rem; }
+  .jd-pro-hero__strip-label { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jd-pro-hero__bg,
+  .jd-pro-hero__aurora-blob,
+  .jd-pro-hero__strip-row,
+  .jd-pro-hero__scroll-indicator,
+  .jd-pro-hero__spotlight,
+  .jd-pro-reveal {
+    animation: none !important;
+    transition: opacity 0.4s ease !important;
+    filter: none !important;
+    transform: none !important;
+  }
+
+  .jd-pro-hero__bg {
+    opacity: 1;
+  }
+}
+

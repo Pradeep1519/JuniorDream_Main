@@ -1,0 +1,68 @@
+.ai-launcher-character {
+  animation: ai-character-arrive 700ms cubic-bezier(.22, 1, .36, 1) both, ai-character-wave 1.8s 700ms ease-in-out both;
+}
+
+.ai-intro-character {
+  animation: ai-intro-enter 900ms cubic-bezier(.22, 1, .36, 1) both, ai-intro-exit 500ms 2700ms ease-in both;
+}
+
+@keyframes ai-intro-enter {
+  from { opacity: 0; transform: translateX(-28px) scale(.72); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes ai-intro-exit {
+  from { opacity: 1; transform: translateX(0) scale(1); }
+  to { opacity: 0; transform: translateX(18px) scale(.72); }
+}
+
+@keyframes ai-character-arrive {
+  from { opacity: 0; transform: translateX(-20px) scale(.8); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes ai-character-wave {
+  0%, 100% { rotate: 0deg; }
+  20% { rotate: -8deg; }
+  40% { rotate: 8deg; }
+  60% { rotate: -4deg; }
+}
+
+.ai-chat-panel {
+  width: min(100%, 420px);
+  max-width: calc(100vw - 1.5rem);
+  height: min(720px, calc(var(--app-vh, 1vh) * 100 - 24px));
+  max-height: calc(var(--app-vh, 1vh) * 100 - 24px);
+  animation: ai-panel-open 220ms ease-out both;
+}
+
+@keyframes ai-panel-open {
+  from { opacity: 0; transform: translateY(14px) scale(.96); transform-origin: bottom right; }
+  to { opacity: 1; transform: translateY(0) scale(1); transform-origin: bottom right; }
+}
+
+@media (max-width: 640px) {
+  .ai-chat-panel {
+    inset-inline: 0.75rem;
+    width: calc(100vw - 1.5rem);
+    max-width: calc(100vw - 1.5rem);
+    height: min(100dvh - 24px, 720px);
+    max-height: min(100dvh - 24px, 720px);
+    animation-name: ai-panel-mobile-open;
+  }
+
+  @keyframes ai-panel-mobile-open {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+.ai-chat-panel textarea,
+.ai-chat-panel input {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.ai-chat-panel .overflow-y-auto {
+  overscroll-behavior: contain;
+}

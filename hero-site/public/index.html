@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Junior Dream — Career Skills</title>
+    <meta
+      name="description"
+      content="Junior Dream — live mentorship, real projects, honest feedback. Full Stack Development, Data Analyst, Data Science and Machine Learning courses."
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Figtree:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="hero">
+      <!-- LEFT COLUMN -->
+      <section class="hero-left">
+        <nav class="nav">
+          <a class="logo" href="/">
+            JUNIOR <span class="accent">DREAM</span>
+          </a>
+          <ul class="nav-links">
+            <li><a href="#courses">Courses</a></li>
+            <li><a href="#mentors">Mentors</a></li>
+            <li><a href="#placements">Placements</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </nav>
+
+        <div class="headline-wrap">
+          <div class="rock-shape" aria-hidden="true">
+            <span class="spark"></span>
+          </div>
+          <h1 class="headline">Career<br />Skills</h1>
+        </div>
+
+        <div class="about">
+          <p class="eyebrow">About</p>
+          <p class="about-copy">
+            We train students in the skills companies actually hire for —
+            through live mentorship, real projects, and honest feedback, not
+            just video lectures.
+          </p>
+        </div>
+
+        <footer class="hero-footer">
+          <a class="explore-link" href="#courses">
+            <span class="explore-small">Double click and</span>
+            <span class="explore-main">Explore all courses <span class="arrow">→</span></span>
+          </a>
+          <div class="socials">
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">Instagram</a>
+            <a href="https://t.me" target="_blank" rel="noopener noreferrer">Telegram</a>
+          </div>
+          <div class="brand-footer">
+            <span class="brand-name">Junior Dream</span>
+            <span class="brand-url">www.juniordream.com</span>
+          </div>
+        </footer>
+      </section>
+
+      <!-- RIGHT COLUMN -->
+      <section class="hero-right" id="courses">
+        <div
+          class="tablist"
+          role="tablist"
+          aria-label="Professional courses"
+          id="course-tablist"
+        >
+          <!-- Tabs are rendered from /api/courses by main.js -->
+        </div>
+
+        <div class="course-panel" id="course-panel">
+          <p class="load-message" id="load-message">Loading courses…</p>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
