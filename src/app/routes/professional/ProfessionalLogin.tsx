@@ -15,10 +15,8 @@ import {
   PROFESSIONAL_APPLICATION_ROUTE,
   PROFESSIONAL_DASHBOARD_ROUTE,
   PROFESSIONAL_FORGOT_PASSWORD_ROUTE,
-  PROFESSIONAL_LOGIN_ROUTE,
   PROFESSIONAL_SIGNUP_ROUTE,
 } from "@/lib/professionalRoutes";
-import { createProfessionalAccount } from "@/lib/account";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -26,13 +24,8 @@ export function ProfessionalLogin() {
   const { user, profile, loading } = useAuth();
   const location = useLocation();
   const isForgotPassword = location.pathname === "/professional/forgot-password";
-  const isSignup = location.pathname === PROFESSIONAL_SIGNUP_ROUTE;
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [signupAttempted, setSignupAttempted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState("");
@@ -67,33 +60,6 @@ export function ProfessionalLogin() {
         setError("We couldn't connect right now. Please try again.");
       } else {
         setError("We couldn't sign you in right now. Please try again.");
-      }
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleSignup = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setSignupAttempted(true);
-    setError("");
-    if (name.trim().length < 2 || getEmailError(email) || password.length < 8 || password !== confirmPassword || !acceptedTerms) return;
-
-    setSubmitting(true);
-    try {
-      await createProfessionalAccount(email.trim().toLowerCase(), password, name.trim());
-    } catch (signupError) {
-      const code = typeof signupError === "object" && signupError && "code" in signupError ? String(signupError.code) : "";
-      if (code.includes("email-already-in-use")) {
-        setError("An account already exists with this email. Please log in instead.");
-      } else if (code.includes("weak-password")) {
-        setError("Choose a stronger password with at least 8 characters.");
-      } else if (code.includes("invalid-email")) {
-        setError("Please enter a valid email address.");
-      } else if (code.includes("network")) {
-        setError("We couldn't connect right now. Please try again.");
-      } else {
-        setError("We couldn't create your account right now. Please try again.");
       }
     } finally {
       setSubmitting(false);
@@ -148,55 +114,6 @@ export function ProfessionalLogin() {
                 <p className="text-sm leading-7 text-black/60">We sent a password reset link if an account exists for this email.</p>
                 <Link to="/professional/login" className="inline-flex items-center gap-2 text-sm font-medium text-[#765708] underline underline-offset-4">Back to login <ArrowRight size={14} aria-hidden="true" /></Link>
               </div>
-            ) : isSignup ? (
-              <form onSubmit={handleSignup} noValidate className="space-y-5">
-                <div className="mb-7">
-                  <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[#F8F5EE] px-3 py-1.5 text-[0.62rem] font-medium uppercase tracking-[0.16em] text-[#80600E]"><Sparkles size={12} aria-hidden="true" /> Join Junior Dream Pro</div>
-                  <h1 className="text-4xl font-light leading-tight" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Create your account.</h1>
-                  <p className="mt-3 text-sm leading-6 text-black/55">Set up your professional learning space and get started.</p>
-                </div>
-                <div>
-                  <label htmlFor="professional-name" className="mb-2 block text-xs font-medium text-black/65">Full name</label>
-                  <input id="professional-name" type="text" autoComplete="name" required maxLength={100} value={name} onChange={(event) => setName(event.target.value)} aria-invalid={signupAttempted && name.trim().length < 2} aria-describedby={signupAttempted && name.trim().length < 2 ? "professional-name-error" : undefined} placeholder="Enter your full name" className="auth-input" />
-                  {signupAttempted && name.trim().length < 2 && <p id="professional-name-error" className="mt-2 text-xs text-red-700">Please enter your name.</p>}
-                </div>
-                <FieldEmail
-                  value={email}
-                  error={signupAttempted ? getEmailError(email) : ""}
-                  onBlur={() => setEmailTouched(true)}
-                  onChange={(value) => {
-                    setEmail(value);
-                    setError("");
-                  }}
-                />
-                <div>
-                  <div className="mb-2 flex items-center justify-between">
-                    <label htmlFor="professional-signup-password" className="text-xs font-medium text-black/65">Password</label>
-                    <span className="text-[0.68rem] text-black/40">At least 8 characters</span>
-                  </div>
-                  <div className="relative">
-                    <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-black/35" size={16} aria-hidden="true" />
-                    <input id="professional-signup-password" type={showPassword ? "text" : "password"} autoComplete="new-password" required minLength={8} value={password} onChange={(event) => setPassword(event.target.value)} aria-invalid={signupAttempted && password.length < 8} aria-describedby={signupAttempted && password.length < 8 ? "professional-signup-password-error" : undefined} placeholder="Create a password" className="auth-input pl-10 pr-20" />
-                    <button type="button" onClick={() => setShowPassword((value) => !value)} className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 text-xs text-black/55 hover:text-black" aria-label={showPassword ? "Hide password" : "Show password"}>{showPassword ? <EyeOff size={14} aria-hidden="true" /> : <Eye size={14} aria-hidden="true" />}{showPassword ? "Hide" : "Show"}</button>
-                  </div>
-                  {signupAttempted && password.length < 8 && <p id="professional-signup-password-error" className="mt-2 text-xs text-red-700">Use at least 8 characters for your password.</p>}
-                </div>
-                <div>
-                  <label htmlFor="professional-confirm-password" className="mb-2 block text-xs font-medium text-black/65">Confirm password</label>
-                  <input id="professional-confirm-password" type={showPassword ? "text" : "password"} autoComplete="new-password" required value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} aria-invalid={signupAttempted && password !== confirmPassword} aria-describedby={signupAttempted && password !== confirmPassword ? "professional-confirm-password-error" : undefined} placeholder="Re-enter your password" className="auth-input" />
-                  {signupAttempted && password !== confirmPassword && <p id="professional-confirm-password-error" className="mt-2 text-xs text-red-700">Passwords do not match.</p>}
-                </div>
-                <div>
-                  <label className="flex cursor-pointer items-start gap-2.5 text-xs leading-5 text-black/55">
-                    <input type="checkbox" checked={acceptedTerms} onChange={(event) => setAcceptedTerms(event.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-[#98700B]" />
-                    <span>I agree to the <Link to="/terms" className="font-medium text-[#765708] underline underline-offset-2">Terms</Link> and <Link to="/privacy" className="font-medium text-[#765708] underline underline-offset-2">Privacy Policy</Link>.</span>
-                  </label>
-                  {signupAttempted && !acceptedTerms && <p className="mt-2 text-xs text-red-700">Please accept the Terms and Privacy Policy to continue.</p>}
-                </div>
-                <ErrorMessage message={error} />
-                <button type="submit" disabled={submitting} className="auth-primary">{submitting ? "Creating account..." : "Create professional account"}</button>
-                <p className="pt-2 text-center text-sm text-black/55">Already have an account? <Link to={PROFESSIONAL_LOGIN_ROUTE} className="font-medium text-[#765708] underline underline-offset-4">Log in</Link></p>
-              </form>
             ) : (
               <form onSubmit={handleReset} noValidate className="space-y-6">
                 <div><p className="text-[0.64rem] font-medium uppercase tracking-[0.2em] text-black/40">Account recovery</p><h1 className="mt-3 text-3xl font-light" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Reset your password</h1><p className="mt-3 text-sm leading-7 text-black/60">Enter your professional account email and we will send a reset link.</p></div>
@@ -243,7 +160,7 @@ export function ProfessionalLogin() {
                       setError("");
                     }}
                     placeholder="Enter your password"
-                    className="auth-input pl-10 pr-4"
+                    className="auth-input auth-input--with-icon"
                   />
                 </div>
                 {passwordTouched && !password && <p id="professional-password-error" className="mt-2 text-xs text-red-700">Please enter your password.</p>}
@@ -294,7 +211,7 @@ function FieldEmail({ value, error, onChange, onBlur }: { value: string; error: 
           onBlur={onBlur}
           onChange={(event) => onChange(event.target.value)}
           placeholder="Enter your email"
-          className="auth-input pl-10"
+          className="auth-input auth-input--with-icon"
         />
       </div>
       {error && <p id="professional-email-error" className="mt-2 text-xs text-red-700">{error}</p>}

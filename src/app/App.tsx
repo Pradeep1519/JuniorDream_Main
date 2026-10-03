@@ -1,5 +1,7 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route } from "react-router";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import { Layout } from "@/components/layout/Layout";
 import { Splash } from "@/components/layout/Splash";
 import { ScrollToTop } from "@/components/layout/ScrollToTop";
@@ -7,6 +9,17 @@ import { SiteTransitionProvider } from "@/components/layout/SiteTransitionProvid
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { ProfessionalLayout } from "@/components/layout/ProfessionalLayout";
 import { PROFESSIONAL_FORGOT_PASSWORD_ROUTE, PROFESSIONAL_LOGIN_ROUTE, PROFESSIONAL_SIGNUP_ROUTE } from "@/lib/professionalRoutes";
+
+function VercelObservability() {
+  const { pathname } = useLocation();
+
+  return (
+    <>
+      <Analytics route={pathname} path={pathname} />
+      <SpeedInsights route={pathname} />
+    </>
+  );
+}
 
 const Home = lazy(() => import("@/app/routes/Home").then((module) => ({ default: module.Home })));
 const About = lazy(() => import("@/app/routes/About").then((module) => ({ default: module.About })));
@@ -37,12 +50,14 @@ const ProfessionalCareer = lazy(() => import("@/app/routes/professional/Professi
 const ProfessionalFAQ = lazy(() => import("@/app/routes/professional/ProfessionalFAQ").then((module) => ({ default: module.ProfessionalFAQ })));
 const ProfessionalContact = lazy(() => import("@/app/routes/professional/ProfessionalContact").then((module) => ({ default: module.ProfessionalContact })));
 const ProfessionalLogin = lazy(() => import("@/app/routes/professional/ProfessionalLogin").then((module) => ({ default: module.ProfessionalLogin })));
+const ProfessionalSignup = lazy(() => import("@/app/routes/professional/ProfessionalSignup").then((module) => ({ default: module.ProfessionalSignup })));
 const ProfessionalApply = lazy(() => import("@/app/routes/professional/ProfessionalApply").then((module) => ({ default: module.ProfessionalApply })));
 const ProfessionalDashboard = lazy(() => import("@/app/routes/professional/ProfessionalDashboard").then((module) => ({ default: module.ProfessionalDashboard })));
 
 function App() {
   return (
     <BrowserRouter>
+      <VercelObservability />
       <AuthProvider>
         <ScrollToTop />
         <Splash />
@@ -83,7 +98,7 @@ function App() {
               <Route path="faq" element={<ProfessionalFAQ />} />
               <Route path="contact" element={<ProfessionalContact />} />
               <Route path={PROFESSIONAL_LOGIN_ROUTE.slice("/professional/".length)} element={<ProfessionalLogin />} />
-              <Route path={PROFESSIONAL_SIGNUP_ROUTE.slice("/professional/".length)} element={<ProfessionalLogin />} />
+              <Route path={PROFESSIONAL_SIGNUP_ROUTE.slice("/professional/".length)} element={<ProfessionalSignup />} />
               <Route path={PROFESSIONAL_FORGOT_PASSWORD_ROUTE.slice("/professional/".length)} element={<ProfessionalLogin />} />
               <Route path="apply" element={<ProfessionalApply />} />
               <Route path="apply/success" element={<ProfessionalApplicationSuccess />} />
