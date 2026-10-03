@@ -1,6 +1,7 @@
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { makeApplicationId } from "@/lib/account";
+import { FirestoreCollections } from "@/lib/firestoreSchema";
 
 export type ApplicationStatus = "new" | "under_review" | "accepted" | "rejected";
 export type PaymentStatus = "pending" | "initiated" | "successful" | "failed" | "cancelled" | "refunded";
@@ -26,7 +27,7 @@ export interface ProfessionalCourseApplicationInput {
   sourcePage: string;
 }
 
-const COLLECTION = "professional_course_applications";
+const COLLECTION = FirestoreCollections.PROFESSIONAL_APPLICATIONS;
 
 // Mirrors the aiLeads.ts / contactSubmissions.ts pattern: explicit doc id, serverTimestamp, status fields.
 export async function createProfessionalApplication(userId: string | null, input: ProfessionalCourseApplicationInput) {

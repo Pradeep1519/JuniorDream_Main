@@ -1,6 +1,7 @@
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { db } from "./firebase";
 import { CounsellorProfile, CourseRecommendation } from "@/data/aiCounsellor";
+import { FirestoreCollections } from "@/lib/firestoreSchema";
 
 export interface AILeadContact {
   name: string;
@@ -17,7 +18,7 @@ export async function saveAILead(
   consentGiven: boolean,
 ) {
   if (!consentGiven) throw new Error("Consent is required before saving contact details.");
-  const leadRef = doc(db, "ai_leads", leadId);
+  const leadRef = doc(db, FirestoreCollections.AI_LEADS, leadId);
   await setDoc(leadRef, {
     ...contact,
     userType: profile.userType,
@@ -46,5 +47,5 @@ export async function saveAILead(
 }
 
 export async function updateAILead(leadId: string, data: Record<string, unknown>) {
-  await setDoc(doc(db, "ai_leads", leadId), { ...data, updatedAt: serverTimestamp() }, { merge: true });
+  await setDoc(doc(db, FirestoreCollections.AI_LEADS, leadId), { ...data, updatedAt: serverTimestamp() }, { merge: true });
 }

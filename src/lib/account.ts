@@ -2,6 +2,7 @@ import { doc, runTransaction, serverTimestamp, setDoc } from "firebase/firestore
 import { createUserWithEmailAndPassword, deleteUser, updateProfile } from "firebase/auth";
 import type { User } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
+import { FirestoreCollections } from "@/lib/firestoreSchema";
 
 export type ApplicantType = "student" | "parent";
 
@@ -48,7 +49,7 @@ export async function createProfessionalAccount(email: string, password: string,
   const credential = await createUserWithEmailAndPassword(auth, email, password);
   try {
     await updateProfile(credential.user, { displayName });
-    await setDoc(doc(db, "users", credential.user.uid), {
+    await setDoc(doc(db, FirestoreCollections.USERS, credential.user.uid), {
       uid: credential.user.uid,
       name: displayName,
       email,
@@ -88,8 +89,8 @@ export async function saveApplicantRecords(
 ) {
   const applicationPath = `applications/${applicationId}`;
   await runTransaction(db, async (transaction) => {
-    const userRef = doc(db, "users", user.uid);
-    const applicationRef = doc(db, "applications", applicationId);
+    const userRef = doc(db, FirestoreCollections.USERS, user.uid);
+    const applicationRef = doc(db, FirestoreCollections.APPLICATIONS, applicationId);
     const userSnapshot = await transaction.get(userRef);
     if (userSnapshot.exists()) {
       throw new Error("An application account already exists for this user.");

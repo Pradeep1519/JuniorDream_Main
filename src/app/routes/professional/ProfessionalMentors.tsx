@@ -129,7 +129,7 @@ export function ProfessionalMentors() {
               Learn from people building real-world careers across data, AI, product, and technology.
             </h2>
           </div>
-          <div className="text-sm text-black/55">8 specialist mentors guiding learners across core skills and career paths.</div>
+          <div className="text-sm text-black/55">4 specialist mentors guiding learners across core skills and career paths.</div>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">

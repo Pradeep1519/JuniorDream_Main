@@ -8,6 +8,7 @@ import { Button } from "@/components/common/Button";
 import { db } from "@/lib/firebase";
 import { createApplicantAccount, makeApplicationId, saveApplicantRecords } from "@/lib/account";
 import type { ApplicantType } from "@/lib/account";
+import { FirestoreCollections } from "@/lib/firestoreSchema";
 
 const inputClass = "w-full rounded-md border border-border bg-input-background px-4 py-3 text-sm outline-none transition focus:border-black/50 focus:ring-2 focus:ring-black/10";
 const labelClass = "mb-2 block text-sm font-medium";
@@ -60,7 +61,11 @@ export function ApplicationForm() {
   const prefilledClass = searchParams.get("class") || "";
   const prefilledTier = searchParams.get("tier") || "";
   const isInterestRegistration = stream === "medical" || stream === "civil-services";
-  const collectionName = stream === "medical" ? "medical_interests" : stream === "civil-services" ? "civil_services_interests" : "applications";
+  const collectionName = stream === "medical"
+    ? FirestoreCollections.MEDICAL_INTERESTS
+    : stream === "civil-services"
+      ? FirestoreCollections.CIVIL_SERVICES_INTERESTS
+      : FirestoreCollections.APPLICATIONS;
   const prefix = stream === "medical" ? "MD" : stream === "civil-services" ? "CS" : "JR";
   const [formData, setFormData] = useState(() => ({ ...initialForm, classApplying: prefilledClass }));
   const [touched, setTouched] = useState<Partial<Record<FieldName, boolean>>>({});
@@ -125,7 +130,7 @@ export function ApplicationForm() {
         const applicantName = formData.applicantName.trim();
         const studentName = formData.userType === "student" ? applicantName : formData.studentName.trim();
         await setDoc(doc(db, collectionName, interestId), {
-          interestId,
+          applicationId: interestId,
           userType: formData.userType,
           applicantName,
           studentName,
@@ -135,6 +140,7 @@ export function ApplicationForm() {
           location: formData.location.trim(),
           stream,
           status: "interest_registered",
+          applicationStatus: "new",
           agreedTerms: formData.agreedTerms,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
