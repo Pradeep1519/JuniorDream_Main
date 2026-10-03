@@ -1,9 +1,12 @@
+import { useEffect, useState } from "react";
 import { ArrowRight, BriefcaseBusiness, BrainCircuit, Building2, CheckCircle2, Cpu, ShieldCheck, Sparkles, TrendingUp, Users } from "lucide-react";
+import { collection, getDocs } from "firebase/firestore";
 import { Link } from "react-router";
 import { Container } from "@/components/common/Container";
 import { JobOpportunityCard } from "@/components/common/JobOpportunityCard";
 import { professionalCourses } from "@/data/professionalCourses";
-import { jobOpportunities } from "@/data/jobOpportunities";
+import { jobOpportunities, type JobOpportunity } from "@/data/jobOpportunities";
+import { db } from "@/lib/firebase";
 import { PROFESSIONAL_APPLICATION_ROUTE } from "@/lib/professionalRoutes";
 
 const categoryOrder = ["Data & AI", "Software Development", "Cloud & Security"] as const;
@@ -29,6 +32,59 @@ const careerAdvantages = [
 ];
 
 export function ProfessionalCareer() {
+  const [displayJobs, setDisplayJobs] = useState<JobOpportunity[]>(jobOpportunities);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadJobs() {
+      try {
+        const snapshot = await getDocs(collection(db, "jobs"));
+        const mapped = snapshot.docs
+          .filter((docItem) => {
+            const job = docItem.data();
+            return job.isActive !== false;
+          })
+          .map((docItem) => {
+            const job = docItem.data();
+            const title = job.title || "Open opportunity";
+            const track = job.department || "Technology";
+            const summary = job.description || `${title} opportunity for aspiring learners.`;
+            const details = [
+              job.location ? `Location: ${job.location}` : "",
+              job.experience ? `Experience: ${job.experience}` : "",
+              job.salary ? `Compensation: ${job.salary}` : "",
+              job.applyLink ? "Apply through Junior Dream portal" : "",
+            ].filter(Boolean);
+
+            return {
+              id: job.id || docItem.id,
+              title,
+              track,
+              format: job.employmentType || "Hiring Webinar",
+              timeline: `${job.location || "Hybrid"} • ${job.experience || "Flexible"}`,
+              summary,
+              details: details.length ? details : ["Open opportunity for interested learners."],
+            } satisfies JobOpportunity;
+          });
+
+        if (isMounted) {
+          setDisplayJobs(mapped.length > 0 ? mapped : jobOpportunities);
+        }
+      } catch (error) {
+        if (isMounted) {
+          setDisplayJobs(jobOpportunities);
+        }
+      }
+    }
+
+    loadJobs();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const groupedCourses = categoryOrder.map((category) => ({
     category,
     courses: professionalCourses.filter((course) => course.category === category),
@@ -187,7 +243,7 @@ export function ProfessionalCareer() {
           </p>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {jobOpportunities.map((job) => (
+            {displayJobs.map((job) => (
               <JobOpportunityCard key={job.id} job={job} applyTo={PROFESSIONAL_APPLICATION_ROUTE} variant="dark" />
             ))}
           </div>

@@ -1,10 +1,12 @@
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { ArrowRight } from "lucide-react";
+import { collection, getDocs } from "firebase/firestore";
 import { Link } from "react-router";
 import { Container } from "@/components/common/Container";
 import { JobOpportunityCard } from "@/components/common/JobOpportunityCard";
 import { engineeringBatches } from "@/data/engineeringCurriculum";
-import { jobOpportunities } from "@/data/jobOpportunities";
+import { jobOpportunities, type JobOpportunity } from "@/data/jobOpportunities";
+import { db } from "@/lib/firebase";
 
 const serif = { fontFamily: "'Playfair Display', Georgia, serif" } as const;
 const sans = { fontFamily: "'Inter', Helvetica, Arial, sans-serif" } as const;
@@ -14,6 +16,59 @@ function Eyebrow({ children }: { children: ReactNode }) {
 }
 
 export function Career() {
+  const [displayJobs, setDisplayJobs] = useState<JobOpportunity[]>(jobOpportunities);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadJobs() {
+      try {
+        const snapshot = await getDocs(collection(db, "jobs"));
+        const mapped = snapshot.docs
+          .filter((docItem) => {
+            const job = docItem.data();
+            return job.isActive !== false;
+          })
+          .map((docItem) => {
+            const job = docItem.data();
+            const title = job.title || "Open opportunity";
+            const track = job.department || "Technology";
+            const summary = job.description || `${title} opportunity for aspiring learners.`;
+            const details = [
+              job.location ? `Location: ${job.location}` : "",
+              job.experience ? `Experience: ${job.experience}` : "",
+              job.salary ? `Compensation: ${job.salary}` : "",
+              job.applyLink ? "Apply through Junior Dream portal" : "",
+            ].filter(Boolean);
+
+            return {
+              id: job.id || docItem.id,
+              title,
+              track,
+              format: job.employmentType || "Hiring Webinar",
+              timeline: `${job.location || "Hybrid"} • ${job.experience || "Flexible"}`,
+              summary,
+              details: details.length ? details : ["Open opportunity for interested learners."],
+            } satisfies JobOpportunity;
+          });
+
+        if (isMounted) {
+          setDisplayJobs(mapped.length > 0 ? mapped : jobOpportunities);
+        }
+      } catch (error) {
+        if (isMounted) {
+          setDisplayJobs(jobOpportunities);
+        }
+      }
+    }
+
+    loadJobs();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
     <div className="bg-white text-black">
       <section className="border-b border-black/10 bg-[#F5F5F2]">
@@ -100,7 +155,7 @@ export function Career() {
             anyone interested — course enrollment is not required to attend or register.
           </p>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {jobOpportunities.map((job) => (
+            {displayJobs.map((job) => (
               <JobOpportunityCard key={job.id} job={job} applyTo="/apply" />
             ))}
           </div>

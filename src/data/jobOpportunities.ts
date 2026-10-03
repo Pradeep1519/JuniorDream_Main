@@ -4,7 +4,7 @@ export interface JobOpportunity {
   id: string;
   title: string;
   track: string;
-  format: "Hiring Webinar" | "Interview Drive";
+  format: string;
   timeline: string;
   summary: string;
   details: string[];

@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowDown, ArrowRight, Check, MessageCircle, Sparkles } from "lucide-react";
+import { collection, getDocs } from "firebase/firestore";
 import { Container } from "@/components/common/Container";
 import { MentorProfileModal } from "@/components/mentors/MentorProfileModal";
 import { mentorSpecializations, mentors, MentorProfile } from "@/data/mentors";
+import { db } from "@/lib/firebase";
 
 const mentoringLoop = [
   ["01", "Understand the student", "Start with the learner’s current level, confidence and questions."],
@@ -33,6 +35,61 @@ function openAI() {
 
 export function Mentorship() {
   const [selectedMentor, setSelectedMentor] = useState<MentorProfile | null>(null);
+  const [displayMentors, setDisplayMentors] = useState<MentorProfile[]>(mentors);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadMentors() {
+      try {
+        const snapshot = await getDocs(collection(db, "mentors"));
+        const mapped = snapshot.docs
+          .filter((docItem) => {
+            const mentor = docItem.data();
+            return mentor.visibleOnWebsite !== false;
+          })
+          .map((docItem) => {
+          const mentor = docItem.data();
+          const expertise = Array.isArray(mentor.expertise)
+            ? mentor.expertise
+            : typeof mentor.expertise === "string"
+              ? mentor.expertise.split(",").map((item) => item.trim()).filter(Boolean)
+              : ["Engineering mentorship"];
+
+          return {
+            id: docItem.id,
+            name: mentor.name || "Mentor Profile",
+            currentRole: mentor.role || mentor.currentRole || "Industry Mentor",
+            company: mentor.company || "Junior Dream",
+            designation: mentor.designation || mentor.company || "Mentor",
+            courseFocus: mentor.courseFocus || mentor.department || "Mentorship",
+            experience: mentor.experience || "Industry mentor",
+            location: mentor.location || "Remote / Hybrid",
+            specialization: expertise.length ? expertise : ["Engineering mentorship"],
+            bio: mentor.bio || "Mentor profile details will appear here as they are verified.",
+            mentoringFocus: mentor.mentoringFocus || "Helping students understand concepts through practical thinking and guided problem solving.",
+            image: mentor.imageUrl || mentor.image || "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=900&q=80",
+            verified: mentor.verified ?? true,
+            placeholder: false,
+          } satisfies MentorProfile;
+        });
+
+        if (isMounted) {
+          setDisplayMentors(mapped.length > 0 ? mapped : mentors);
+        }
+      } catch (error) {
+        if (isMounted) {
+          setDisplayMentors(mentors);
+        }
+      }
+    }
+
+    loadMentors();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <div className="mentor-page bg-[#F8F8F6] text-black">
@@ -88,8 +145,7 @@ export function Mentorship() {
 
       <section className="bg-[#111111] py-24 text-white md:py-32"><Container><div className="max-w-2xl"><div className="eyebrow text-white/45">The quiet transformation</div><h2 className="mt-4 text-4xl font-light leading-tight md:text-6xl">And then something changes.</h2><p className="mt-6 text-base leading-8 text-white/60">The objective is not simply to finish a chapter. It is to reach the moment when a student starts asking better questions.</p></div><div className="mt-14 grid gap-3 md:grid-cols-3">{transformation.map((line, index) => <div key={line} className="flex items-start gap-4 border-t border-white/15 py-5"><span className="text-xs text-white/35">0{index + 1}</span><span className="text-xl font-light text-white/85">{line}</span></div>)}</div></Container></section>
 
-      <section id="mentors" className="py-24 md:py-32"><Container><div className="flex flex-col justify-between gap-6 md:flex-row md:items-end"><div><div className="eyebrow">The network</div><h2 className="mt-4 text-4xl font-light md:text-6xl">Meet the people behind the mentorship.</h2></div><p className="max-w-sm text-sm leading-6 text-black/55">Verified mentor profiles will be published as the network grows. We would rather show an honest placeholder than invent a credential.</p></div><div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">{mentors.map((mentor) => <article key={mentor.id} className="group overflow-hidden rounded-[22px] border border-black/10 bg-white"><div className="aspect-[1.1] overflow-hidden"><img src={mentor.image} alt="Mentor network placeholder" loading="lazy" className="h-full w-full object-cover grayscale transition duration-500 group-hover:scale-105 group-hover:grayscale-0" /></div><div className="p-5"><div className="text-[0.62rem] uppercase tracking-[0.16em] text-black/40">{mentor.currentRole}</div><h3 className="mt-2 text-lg font-medium">{mentor.name}</h3><div className="mt-3 flex flex-wrap gap-1.5">{mentor.specialization.map((item) => <span key={item} className="rounded-full bg-[#F5F5F3] px-2 py-1 text-[0.6rem] text-black/55">{item}</span>)}</div><button type="button" onClick={() => setSelectedMentor(mentor)} className="mt-5 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.12em] text-black/60 transition hover:text-black">View profile <ArrowRight size={13} /></button></div></article>)}</div><div className="mt-10 rounded-[24px] border border-dashed border-black/15 bg-white p-7 text-center"><Sparkles size={18} className="mx-auto text-black/35" /><h3 className="mt-4 text-2xl font-light">More industry mentors coming soon.</h3><p className="mx-auto mt-2 max-w-md text-sm leading-6 text-black/55">Junior Dream is building a thoughtful network across engineering and technology. New profiles will appear after their information is verified.</p></div></Container></section>
-
+      <section id="mentors" className="py-24 md:py-32"><Container><div className="flex flex-col justify-between gap-6 md:flex-row md:items-end"><div><div className="eyebrow">The network</div><h2 className="mt-4 text-4xl font-light md:text-6xl">Meet the people behind the mentorship.</h2></div><p className="max-w-sm text-sm leading-6 text-black/55">Verified mentor profiles will be published as the network grows. We would rather show an honest placeholder than invent a credential.</p></div>      <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">{displayMentors.map((mentor) => <article key={mentor.id} className="group overflow-hidden rounded-[22px] border border-black/10 bg-white"><div className="aspect-[1.1] overflow-hidden"><img src={mentor.image} alt={mentor.name} loading="lazy" className="h-full w-full object-cover grayscale transition duration-500 group-hover:scale-105 group-hover:grayscale-0" /></div><div className="p-5"><div className="text-[0.62rem] uppercase tracking-[0.16em] text-black/40">{mentor.currentRole}</div><h3 className="mt-2 text-lg font-medium">{mentor.name}</h3><div className="mt-3 flex flex-wrap gap-1.5">{mentor.specialization.map((item) => <span key={item} className="rounded-full bg-[#F5F5F3] px-2 py-1 text-[0.6rem] text-black/55">{item}</span>)}</div><button type="button" onClick={() => setSelectedMentor(mentor)} className="mt-5 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.12em] text-black/60 transition hover:text-black">View profile <ArrowRight size={13} /></button></div></article>)}</div>{displayMentors.length === 0 && <div className="mt-10 rounded-[24px] border border-dashed border-black/15 bg-white p-7 text-center"><Sparkles size={18} className="mx-auto text-black/35" /><h3 className="mt-4 text-2xl font-light">More industry mentors coming soon.</h3><p className="mx-auto mt-2 max-w-md text-sm leading-6 text-black/55">Junior Dream is building a thoughtful network across engineering and technology. New profiles will appear after their information is verified.</p></div>}</Container></section>
       <section className="border-y border-black/10 bg-white py-24 md:py-32"><Container><div className="max-w-2xl"><div className="eyebrow">The mentor’s role</div><h2 className="mt-4 text-4xl font-light leading-tight md:text-6xl">So, what does an industry mentor actually do?</h2></div><div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{mentorActions.map(([title, description]) => <div key={title} className="rounded-2xl border border-black/10 p-5"><div className="text-lg font-medium">{title}</div><p className="mt-3 text-sm leading-6 text-black/55">{description}</p></div>)}</div></Container></section>
 
       <section className="py-24 md:py-32"><Container><div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:items-center"><div><div className="eyebrow">Beyond marks</div><h2 className="mt-4 text-4xl font-light leading-tight md:text-6xl">We do not measure a child only by marks.</h2><p className="mt-6 text-base leading-8 text-black/60">Engineering development also lives in the questions a student asks, the way they break a problem down, and how willing they are to learn from a mistake.</p></div><div className="grid grid-cols-2 gap-3">{["Asking questions", "Understanding concepts", "Breaking problems down", "Applying knowledge", "Building things", "Explaining reasoning", "Learning from mistakes", "Becoming independent"].map((item) => <div key={item} className="rounded-xl bg-white p-4 text-sm text-black/65 shadow-[0_10px_30px_rgba(0,0,0,0.04)]">{item}</div>)}</div></div></Container></section>
