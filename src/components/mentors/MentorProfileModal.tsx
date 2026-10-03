@@ -21,21 +21,24 @@ export function MentorProfileModal({ mentor, onClose }: MentorProfileModalProps)
         role="dialog"
         aria-modal="true"
         aria-labelledby="mentor-profile-title"
-        className="popup-panel-enter max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-[30px] bg-white p-5 shadow-[0_30px_90px_rgba(0,0,0,0.12)] sm:p-8"
+        className="popup-panel-enter max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-[30px] bg-white p-5 shadow-[0_30px_90px_rgba(0,0,0,0.12)] sm:p-8"
         onMouseDown={(event) => event.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-4">
           <div>
             <div className="text-[0.62rem] font-medium uppercase tracking-[0.2em] text-black/40">Mentor profile</div>
-            <h2 id="mentor-profile-title" className="mt-2 text-3xl font-light text-black">{mentor.name}</h2>
+            <h2 id="mentor-profile-title" className="mt-2 text-3xl font-light text-black sm:text-4xl" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>{mentor.name}</h2>
           </div>
           <button type="button" onClick={onClose} aria-label="Close mentor profile" className="rounded-full p-2 text-black/50 transition hover:bg-black/5 hover:text-black">
             <X size={20} />
           </button>
         </div>
 
-        <div className="mt-7 grid gap-6 sm:grid-cols-[200px_1fr]">
-          <img src={mentor.image} alt={`${mentor.name} mentor profile`} className="aspect-[4/5] w-full rounded-[24px] object-cover shadow-[0_20px_40px_rgba(0,0,0,0.08)]" />
+        <div className="mt-7 grid gap-6 sm:grid-cols-[220px_1fr]">
+          <div className="relative aspect-[4/5] overflow-hidden rounded-[24px] bg-[#F1F0EC] shadow-[0_20px_40px_rgba(0,0,0,0.08)]">
+            <div className="absolute inset-0 grid place-items-center text-5xl font-light text-black/25" aria-hidden="true">{mentor.name.trim().charAt(0).toUpperCase()}</div>
+            <img src={mentor.image} alt={`${mentor.name} mentor profile`} onError={(event) => { event.currentTarget.style.display = "none"; }} className="relative h-full w-full object-cover" />
+          </div>
           <div>
             {mentor.courseFocus && <div className="inline-flex rounded-full border border-black/10 bg-[#F4F3EE] px-3 py-1.5 text-[0.62rem] font-medium uppercase tracking-[0.14em] text-black/60">{mentor.courseFocus}</div>}
             <div className="mt-4 text-xl font-medium text-black">{mentor.currentRole}</div>
@@ -44,19 +47,22 @@ export function MentorProfileModal({ mentor, onClose }: MentorProfileModalProps)
             <div className="mt-4 flex flex-wrap gap-2">
               {mentor.specialization.map((item) => <span key={item} className="rounded-full border border-black/10 bg-[#F8F8F8] px-3 py-1.5 text-xs text-black/60">{item}</span>)}
             </div>
-            <p className="mt-5 text-sm leading-7 text-black/65">{mentor.bio}</p>
+            <div className="mt-6 border-t border-black/10 pt-5">
+              <div className="text-[0.62rem] font-medium uppercase tracking-[0.16em] text-black/40">Professional perspective</div>
+              <p className="mt-3 text-sm leading-7 text-black/70">{mentor.bio}</p>
+            </div>
           </div>
         </div>
 
         <div className="mt-7 grid gap-4 border-t border-black/10 pt-6 sm:grid-cols-2">
           <div className="rounded-2xl bg-[#F8F8F8] p-4">
-            <div className="text-[0.62rem] uppercase tracking-[0.16em] text-black/40">Mentoring focus</div>
+            <div className="text-[0.62rem] uppercase tracking-[0.16em] text-black/40">How they guide learners</div>
             <p className="mt-2 text-sm leading-6 text-black/65">{mentor.mentoringFocus}</p>
           </div>
           <div className="rounded-2xl bg-[#F8F8F8] p-4">
-            <div className="text-[0.62rem] uppercase tracking-[0.16em] text-black/40">Profile status</div>
+            <div className="text-[0.62rem] uppercase tracking-[0.16em] text-black/40">Profile note</div>
             <p className="mt-2 text-sm leading-6 text-black/65">
-              {mentor.verified ? "Verified industry profile" : "Profile details will be published after verification."}
+              {mentor.profileStatus ?? (mentor.verified ? "Verified industry profile" : "Profile details will be published after verification.")}
             </p>
             {mentor.location && <div className="mt-3 text-xs uppercase tracking-[0.12em] text-black/45">{mentor.location}</div>}
           </div>

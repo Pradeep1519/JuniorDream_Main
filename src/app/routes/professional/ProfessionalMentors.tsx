@@ -140,12 +140,14 @@ export function ProfessionalMentors() {
               onClick={() => setSelectedMentor(mentor)}
               className="group overflow-hidden rounded-[28px] border border-black/10 bg-white text-left shadow-[0_18px_40px_rgba(0,0,0,0.04)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_26px_60px_rgba(0,0,0,0.08)]"
             >
-              <div className="overflow-hidden">
+              <div className="relative aspect-[4/5] overflow-hidden bg-[#F1F0EC]">
+                <div className="absolute inset-0 grid place-items-center text-5xl font-light text-black/25" aria-hidden="true">{mentor.name.trim().charAt(0).toUpperCase()}</div>
                 <img
                   src={mentor.image}
                   alt={mentor.name}
                   loading="lazy"
-                  className="aspect-[4/5] w-full object-cover transition duration-500 group-hover:scale-105"
+                  onError={(event) => { event.currentTarget.style.display = "none"; }}
+                  className="relative h-full w-full object-cover transition duration-500 group-hover:scale-105"
                 />
               </div>
               <div className="p-5">

@@ -13,6 +13,7 @@ export interface MentorProfile {
   image: string;
   verified: boolean;
   placeholder?: boolean;
+  profileStatus?: string;
 }
 
 const placeholderImage = "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=900&q=80";
