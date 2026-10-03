@@ -60,17 +60,40 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly([
           'uid', 'name', 'email', 'mobile', 'userType', 'studentName',
           'classApplying', 'previousSchool', 'stream', 'batchLevel', 'tier',
-          'applicationId', 'applicationPath', 'applicationStatus', 'createdAt', 'updatedAt'
+          'applicationId', 'applicationPath', 'applicationStatus', 'createdAt', 'updatedAt',
+          'platform'
         ])
         && request.resource.data.uid == uid
         && request.resource.data.email == request.auth.token.email
-        && request.resource.data.userType in ['student', 'parent']
-        && request.resource.data.applicationPath == 'applications/' + request.resource.data.applicationId
-        && request.resource.data.applicationStatus == 'new'
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 2
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time
-        && getAfter(/databases/$(database)/documents/applications/$(request.resource.data.applicationId)).data.applicationId
-          == request.resource.data.applicationId;
+        && (
+          (
+            (!request.resource.data.keys().hasAny(['platform']) || request.resource.data.platform == 'academic')
+            && request.resource.data.userType in ['student', 'parent']
+            && request.resource.data.applicationPath == 'applications/' + request.resource.data.applicationId
+            && request.resource.data.applicationStatus == 'new'
+            && getAfter(/databases/$(database)/documents/applications/$(request.resource.data.applicationId)).data.applicationId
+              == request.resource.data.applicationId
+          )
+          ||
+          (
+            request.resource.data.platform == 'professional'
+            && request.resource.data.userType == 'student'
+            && request.resource.data.studentName == request.resource.data.name
+            && request.resource.data.mobile == ''
+            && request.resource.data.classApplying == 'Professional'
+            && request.resource.data.previousSchool == null
+            && request.resource.data.stream == 'professional'
+            && request.resource.data.batchLevel == null
+            && request.resource.data.tier == null
+            && request.resource.data.applicationId == ''
+            && request.resource.data.applicationPath == ''
+            && request.resource.data.applicationStatus == 'account-only'
+          )
+        );
       allow update, delete: if false;
     }
 

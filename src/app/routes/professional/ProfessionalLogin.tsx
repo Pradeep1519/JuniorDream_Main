@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, Navigate, useLocation } from "react-router";
 import {
@@ -8,14 +8,17 @@ import {
   setPersistence,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { ArrowRight, Check, Eye, EyeOff, LockKeyhole, Mail, Network, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Eye, EyeOff, LockKeyhole, Mail, Network, Sparkles } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { useAuth } from "@/components/auth/AuthProvider";
 import {
   PROFESSIONAL_APPLICATION_ROUTE,
   PROFESSIONAL_DASHBOARD_ROUTE,
   PROFESSIONAL_FORGOT_PASSWORD_ROUTE,
+  PROFESSIONAL_LOGIN_ROUTE,
+  PROFESSIONAL_SIGNUP_ROUTE,
 } from "@/lib/professionalRoutes";
+import { createProfessionalAccount } from "@/lib/account";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -23,42 +26,34 @@ export function ProfessionalLogin() {
   const { user, profile, loading } = useAuth();
   const location = useLocation();
   const isForgotPassword = location.pathname === "/professional/forgot-password";
+  const isSignup = location.pathname === PROFESSIONAL_SIGNUP_ROUTE;
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [signupAttempted, setSignupAttempted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState("");
+  const [emailTouched, setEmailTouched] = useState(false);
+  const [passwordTouched, setPasswordTouched] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [resetSent, setResetSent] = useState(false);
   const [resetBusy, setResetBusy] = useState(false);
-  const [reduceMotion, setReduceMotion] = useState(false);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const updatePreference = () => setReduceMotion(mediaQuery.matches);
-    updatePreference();
-    mediaQuery.addEventListener("change", updatePreference);
-    return () => mediaQuery.removeEventListener("change", updatePreference);
-  }, []);
-
   if (!loading && user && !isForgotPassword && profile?.platform === "professional") return <Navigate to={PROFESSIONAL_DASHBOARD_ROUTE} replace />;
 
   const validateEmail = () => {
-    if (!email.trim() || !emailPattern.test(email.trim())) {
-      setError("Please enter a valid email address.");
-      return false;
-    }
-    return true;
+    setEmailTouched(true);
+    return !getEmailError(email);
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
-    if (!validateEmail()) return;
-    if (!password) {
-      setError("Please enter your password.");
-      return;
-    }
+    setEmailTouched(true);
+    setPasswordTouched(true);
+    if (getEmailError(email) || !password) return;
 
     setSubmitting(true);
     try {
@@ -72,6 +67,33 @@ export function ProfessionalLogin() {
         setError("We couldn't connect right now. Please try again.");
       } else {
         setError("We couldn't sign you in right now. Please try again.");
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleSignup = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSignupAttempted(true);
+    setError("");
+    if (name.trim().length < 2 || getEmailError(email) || password.length < 8 || password !== confirmPassword || !acceptedTerms) return;
+
+    setSubmitting(true);
+    try {
+      await createProfessionalAccount(email.trim().toLowerCase(), password, name.trim());
+    } catch (signupError) {
+      const code = typeof signupError === "object" && signupError && "code" in signupError ? String(signupError.code) : "";
+      if (code.includes("email-already-in-use")) {
+        setError("An account already exists with this email. Please log in instead.");
+      } else if (code.includes("weak-password")) {
+        setError("Choose a stronger password with at least 8 characters.");
+      } else if (code.includes("invalid-email")) {
+        setError("Please enter a valid email address.");
+      } else if (code.includes("network")) {
+        setError("We couldn't connect right now. Please try again.");
+      } else {
+        setError("We couldn't create your account right now. Please try again.");
       }
     } finally {
       setSubmitting(false);
@@ -95,60 +117,152 @@ export function ProfessionalLogin() {
   };
 
   return (
-    <div className="professional-auth min-h-screen overflow-x-hidden bg-[#080B10] text-white">
-      <div className="professional-auth__grid pointer-events-none fixed inset-0" aria-hidden="true" />
-      <div className="mx-auto grid min-h-screen max-w-[1440px] lg:grid-cols-[1.08fr_0.92fr]">
-        <section className="professional-auth__visual relative flex min-h-[430px] flex-col justify-between overflow-hidden px-6 py-8 sm:px-10 lg:min-h-screen lg:px-16 lg:py-12">
-          <div className="professional-auth__network pointer-events-none absolute inset-0" aria-hidden="true">
-            <span className="professional-auth__node professional-auth__node--one" />
-            <span className="professional-auth__node professional-auth__node--two" />
-            <span className="professional-auth__node professional-auth__node--three" />
-            <span className="professional-auth__node professional-auth__node--four" />
-          </div>
-          <div className={`relative z-10 professional-auth__reveal ${reduceMotion ? "professional-auth__reveal--ready" : ""}`}>
-            <Link to="/professional" className="inline-flex items-center gap-3 text-xs font-medium uppercase tracking-[0.24em] text-white/70 no-underline">
-              <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/5"><Network size={15} aria-hidden="true" /></span>
-              Junior Dream / Professional
-            </Link>
-          </div>
-          <div className={`relative z-10 max-w-xl professional-auth__reveal professional-auth__reveal--delay ${reduceMotion ? "professional-auth__reveal--ready" : ""}`}>
-            <div className="mb-5 flex items-center gap-2 text-[0.65rem] font-medium uppercase tracking-[0.28em] text-[#8CB9FF]"><Sparkles size={14} aria-hidden="true" /> Career-ready learning</div>
-            <h1 className="max-w-lg text-5xl font-light leading-[0.98] sm:text-7xl" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Learn. Build. Become industry ready.</h1>
-            <p className="mt-6 max-w-md text-sm leading-7 text-white/55 sm:text-base">Build practical technology skills that move your career forward.</p>
-            <div className="mt-10 flex items-center gap-3 text-xs uppercase tracking-[0.16em] text-white/40"><span className="h-px w-12 bg-white/25" /> Data, software, cloud & AI</div>
-          </div>
-          <div className="relative z-10 hidden text-[0.65rem] uppercase tracking-[0.18em] text-white/35 lg:block">A focused space for your next chapter.</div>
-        </section>
+    <div className="professional-auth min-h-screen bg-[#F8F8F6] text-[#171717]">
+      <header className="professional-auth__header bg-[#0A0A0A] text-white">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-5 sm:px-8">
+          <Link to="/professional" className="inline-flex items-center gap-3 text-xs font-medium uppercase tracking-[0.2em] text-white no-underline sm:text-sm">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/[0.06] text-[#D7B77A]"><Network size={17} aria-hidden="true" /></span>
+            <span>Junior Dream <span className="text-[#D7B77A]">/</span> Professional</span>
+          </Link>
+          <Link to="/professional" className="inline-flex items-center gap-2 text-xs text-white/65 no-underline transition-colors hover:text-white sm:text-sm">
+            <ArrowLeft size={14} aria-hidden="true" /> <span className="hidden sm:inline">Back to website</span><span className="sm:hidden">Back</span>
+          </Link>
+        </div>
+      </header>
 
-        <section className="flex items-center bg-[#F4F5F1] px-5 py-10 text-[#101317] sm:px-10 lg:px-16">
-          <div className="mx-auto w-full max-w-md rounded-[28px] border border-black/10 bg-white/90 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.22)] backdrop-blur-xl sm:p-9">
-            <div className="mb-9 flex items-center justify-between gap-4">
-              <div><p className="m-0 text-[0.62rem] font-medium uppercase tracking-[0.22em] text-black/40">Junior Dream Pro</p><p className="mt-2 text-xs text-black/45">Your professional learning space</p></div>
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0B0E13] text-white"><LockKeyhole size={16} aria-hidden="true" /></div>
+      <main className="mx-auto flex min-h-[calc(100vh-81px)] max-w-6xl flex-col items-center px-4 py-10 sm:px-8 sm:py-16">
+        <div className="professional-auth__card w-full max-w-xl rounded-[26px] border border-black/10 bg-white p-6 shadow-[0_24px_70px_rgba(0,0,0,0.08)] sm:p-10">
+          <div className="mb-8 flex items-center justify-between gap-4 border-b border-black/[0.07] pb-6">
+            <div>
+              <p className="m-0 text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-[#98700B]">Professional portal</p>
+              <p className="mt-2 text-xs text-black/50">Your next chapter starts here</p>
             </div>
-
-            {isForgotPassword ? (
-              resetSent ? (
-                <div className="space-y-5" role="status"><div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#E6F2EA] text-[#1D6B43]"><Check size={22} aria-hidden="true" /></div><h2 className="text-3xl font-light">Check your inbox.</h2><p className="text-sm leading-7 text-black/60">We sent a password reset link if an account exists for this email.</p><Link to="/professional/login" className="inline-flex items-center gap-2 text-sm font-medium text-black underline underline-offset-4">Back to login <ArrowRight size={14} aria-hidden="true" /></Link></div>
-              ) : (
-                <form onSubmit={handleReset} noValidate className="space-y-5"><p className="text-[0.64rem] font-medium uppercase tracking-[0.2em] text-black/40">Account recovery</p><h1 className="text-3xl font-light">Reset your password</h1><p className="text-sm leading-7 text-black/60">Enter your professional account email and we will send a reset link.</p><FieldEmail value={email} onChange={setEmail} /><ErrorMessage message={error} /><button type="submit" disabled={resetBusy} className="auth-primary">{resetBusy ? "Sending link..." : "Send reset link"}</button><Link to="/professional/login" className="block text-center text-sm text-black/55 underline underline-offset-4">Back to login</Link></form>
-              )
-            ) : (
-              <form onSubmit={handleSubmit} noValidate className="space-y-5">
-                <div><p className="text-[0.64rem] font-medium uppercase tracking-[0.2em] text-black/40">Welcome back</p><h1 className="mt-3 text-4xl font-light" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Welcome back.</h1><p className="mt-3 text-sm leading-7 text-black/60">Log in to continue your professional learning journey.</p></div>
-                <FieldEmail value={email} onChange={setEmail} />
-                <div><div className="mb-2 flex items-center justify-between"><label htmlFor="professional-password" className="text-xs font-medium uppercase tracking-[0.12em] text-black/60">Password</label><button type="button" onClick={() => setShowPassword((value) => !value)} className="inline-flex items-center gap-1 text-xs text-black/55 hover:text-black" aria-label={showPassword ? "Hide password" : "Show password"}>{showPassword ? <EyeOff size={14} aria-hidden="true" /> : <Eye size={14} aria-hidden="true" />}{showPassword ? "Hide" : "Show"}</button></div><div className="relative"><LockKeyhole className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-black/35" size={16} aria-hidden="true" /><input id="professional-password" type={showPassword ? "text" : "password"} autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Enter your password" className="auth-input pl-10 pr-4" /></div></div>
-                <div className="flex items-center justify-between gap-3 text-sm"><label className="inline-flex items-center gap-2 text-black/55"><input type="checkbox" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} className="h-4 w-4 accent-[#0B0E13]" /> Remember me</label><Link to={PROFESSIONAL_FORGOT_PASSWORD_ROUTE} className="font-medium text-black underline underline-offset-4">Forgot Password?</Link></div>
-                <ErrorMessage message={error} />
-                <button type="submit" disabled={submitting} className="auth-primary">{submitting ? "Logging in..." : "Log In"}</button>
-                <div className="flex items-center gap-3 text-[0.65rem] uppercase tracking-[0.16em] text-black/30"><span className="h-px flex-1 bg-black/10" /> or <span className="h-px flex-1 bg-black/10" /></div>
-                <button type="button" disabled className="auth-google" title="Google sign-in will be available soon"><span className="inline-flex items-center gap-3"><GoogleMark /> Continue with Google</span><span className="text-[0.65rem] text-black/35">Coming soon</span></button>
-                <p className="pt-2 text-center text-sm text-black/55">Don't have an account? <Link to={PROFESSIONAL_APPLICATION_ROUTE} className="font-medium text-black underline underline-offset-4">Apply / Create Account</Link></p>
-              </form>
-            )}
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#F6F1E7] text-[#98700B]"><LockKeyhole size={17} aria-hidden="true" /></div>
           </div>
-        </section>
-      </div>
+
+          {isForgotPassword ? (
+            resetSent ? (
+              <div className="space-y-5" role="status">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#E6F2EA] text-[#1D6B43]"><Check size={22} aria-hidden="true" /></div>
+                <h1 className="text-3xl font-light" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Check your inbox.</h1>
+                <p className="text-sm leading-7 text-black/60">We sent a password reset link if an account exists for this email.</p>
+                <Link to="/professional/login" className="inline-flex items-center gap-2 text-sm font-medium text-[#765708] underline underline-offset-4">Back to login <ArrowRight size={14} aria-hidden="true" /></Link>
+              </div>
+            ) : isSignup ? (
+              <form onSubmit={handleSignup} noValidate className="space-y-5">
+                <div className="mb-7">
+                  <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[#F8F5EE] px-3 py-1.5 text-[0.62rem] font-medium uppercase tracking-[0.16em] text-[#80600E]"><Sparkles size={12} aria-hidden="true" /> Join Junior Dream Pro</div>
+                  <h1 className="text-4xl font-light leading-tight" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Create your account.</h1>
+                  <p className="mt-3 text-sm leading-6 text-black/55">Set up your professional learning space and get started.</p>
+                </div>
+                <div>
+                  <label htmlFor="professional-name" className="mb-2 block text-xs font-medium text-black/65">Full name</label>
+                  <input id="professional-name" type="text" autoComplete="name" required maxLength={100} value={name} onChange={(event) => setName(event.target.value)} aria-invalid={signupAttempted && name.trim().length < 2} aria-describedby={signupAttempted && name.trim().length < 2 ? "professional-name-error" : undefined} placeholder="Enter your full name" className="auth-input" />
+                  {signupAttempted && name.trim().length < 2 && <p id="professional-name-error" className="mt-2 text-xs text-red-700">Please enter your name.</p>}
+                </div>
+                <FieldEmail
+                  value={email}
+                  error={signupAttempted ? getEmailError(email) : ""}
+                  onBlur={() => setEmailTouched(true)}
+                  onChange={(value) => {
+                    setEmail(value);
+                    setError("");
+                  }}
+                />
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <label htmlFor="professional-signup-password" className="text-xs font-medium text-black/65">Password</label>
+                    <span className="text-[0.68rem] text-black/40">At least 8 characters</span>
+                  </div>
+                  <div className="relative">
+                    <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-black/35" size={16} aria-hidden="true" />
+                    <input id="professional-signup-password" type={showPassword ? "text" : "password"} autoComplete="new-password" required minLength={8} value={password} onChange={(event) => setPassword(event.target.value)} aria-invalid={signupAttempted && password.length < 8} aria-describedby={signupAttempted && password.length < 8 ? "professional-signup-password-error" : undefined} placeholder="Create a password" className="auth-input pl-10 pr-20" />
+                    <button type="button" onClick={() => setShowPassword((value) => !value)} className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 text-xs text-black/55 hover:text-black" aria-label={showPassword ? "Hide password" : "Show password"}>{showPassword ? <EyeOff size={14} aria-hidden="true" /> : <Eye size={14} aria-hidden="true" />}{showPassword ? "Hide" : "Show"}</button>
+                  </div>
+                  {signupAttempted && password.length < 8 && <p id="professional-signup-password-error" className="mt-2 text-xs text-red-700">Use at least 8 characters for your password.</p>}
+                </div>
+                <div>
+                  <label htmlFor="professional-confirm-password" className="mb-2 block text-xs font-medium text-black/65">Confirm password</label>
+                  <input id="professional-confirm-password" type={showPassword ? "text" : "password"} autoComplete="new-password" required value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} aria-invalid={signupAttempted && password !== confirmPassword} aria-describedby={signupAttempted && password !== confirmPassword ? "professional-confirm-password-error" : undefined} placeholder="Re-enter your password" className="auth-input" />
+                  {signupAttempted && password !== confirmPassword && <p id="professional-confirm-password-error" className="mt-2 text-xs text-red-700">Passwords do not match.</p>}
+                </div>
+                <div>
+                  <label className="flex cursor-pointer items-start gap-2.5 text-xs leading-5 text-black/55">
+                    <input type="checkbox" checked={acceptedTerms} onChange={(event) => setAcceptedTerms(event.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-[#98700B]" />
+                    <span>I agree to the <Link to="/terms" className="font-medium text-[#765708] underline underline-offset-2">Terms</Link> and <Link to="/privacy" className="font-medium text-[#765708] underline underline-offset-2">Privacy Policy</Link>.</span>
+                  </label>
+                  {signupAttempted && !acceptedTerms && <p className="mt-2 text-xs text-red-700">Please accept the Terms and Privacy Policy to continue.</p>}
+                </div>
+                <ErrorMessage message={error} />
+                <button type="submit" disabled={submitting} className="auth-primary">{submitting ? "Creating account..." : "Create professional account"}</button>
+                <p className="pt-2 text-center text-sm text-black/55">Already have an account? <Link to={PROFESSIONAL_LOGIN_ROUTE} className="font-medium text-[#765708] underline underline-offset-4">Log in</Link></p>
+              </form>
+            ) : (
+              <form onSubmit={handleReset} noValidate className="space-y-6">
+                <div><p className="text-[0.64rem] font-medium uppercase tracking-[0.2em] text-black/40">Account recovery</p><h1 className="mt-3 text-3xl font-light" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Reset your password</h1><p className="mt-3 text-sm leading-7 text-black/60">Enter your professional account email and we will send a reset link.</p></div>
+                <FieldEmail value={email} error={emailTouched ? getEmailError(email) : ""} onBlur={() => setEmailTouched(true)} onChange={(value) => { setEmail(value); setError(""); }} />
+                <ErrorMessage message={error} />
+                <button type="submit" disabled={resetBusy} className="auth-primary">{resetBusy ? "Sending link..." : "Send reset link"}</button>
+                <Link to="/professional/login" className="block text-center text-sm text-black/55 underline underline-offset-4">Back to login</Link>
+              </form>
+            )
+          ) : (
+            <form onSubmit={handleSubmit} noValidate className="space-y-5">
+              <div className="mb-7">
+                <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[#F8F5EE] px-3 py-1.5 text-[0.62rem] font-medium uppercase tracking-[0.16em] text-[#80600E]"><Sparkles size={12} aria-hidden="true" /> Career-ready learning</div>
+                <h1 className="text-4xl font-light leading-tight" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>Welcome back.</h1>
+                <p className="mt-3 text-sm leading-6 text-black/55">Sign in to continue your professional learning journey.</p>
+              </div>
+              <FieldEmail
+                value={email}
+                error={emailTouched ? getEmailError(email) : ""}
+                onBlur={() => setEmailTouched(true)}
+                onChange={(value) => {
+                  setEmail(value);
+                  setError("");
+                }}
+              />
+              <div>
+                <div className="mb-2 flex items-center justify-between">
+                  <label htmlFor="professional-password" className="text-xs font-medium text-black/65">Password</label>
+                  <button type="button" onClick={() => setShowPassword((value) => !value)} className="inline-flex items-center gap-1 text-xs text-black/55 hover:text-black" aria-label={showPassword ? "Hide password" : "Show password"}>{showPassword ? <EyeOff size={14} aria-hidden="true" /> : <Eye size={14} aria-hidden="true" />}{showPassword ? "Hide" : "Show"}</button>
+                </div>
+                <div className="relative">
+                  <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-black/35" size={16} aria-hidden="true" />
+                  <input
+                    id="professional-password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
+                    required
+                    aria-invalid={passwordTouched && !password}
+                    aria-describedby={passwordTouched && !password ? "professional-password-error" : undefined}
+                    value={password}
+                    onBlur={() => setPasswordTouched(true)}
+                    onChange={(event) => {
+                      setPassword(event.target.value);
+                      setError("");
+                    }}
+                    placeholder="Enter your password"
+                    className="auth-input pl-10 pr-4"
+                  />
+                </div>
+                {passwordTouched && !password && <p id="professional-password-error" className="mt-2 text-xs text-red-700">Please enter your password.</p>}
+              </div>
+              <div className="flex items-center justify-between gap-3 text-sm">
+                <label className="inline-flex cursor-pointer items-center gap-2 text-black/55"><input type="checkbox" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} className="h-4 w-4 accent-[#98700B]" /> Remember me</label>
+                <Link to={PROFESSIONAL_FORGOT_PASSWORD_ROUTE} className="font-medium text-[#765708] underline underline-offset-4">Forgot password?</Link>
+              </div>
+              <ErrorMessage message={error} />
+              <button type="submit" disabled={submitting} className="auth-primary">{submitting ? "Signing in..." : "Sign in to your account"}</button>
+              <div className="flex items-center gap-3 text-[0.65rem] uppercase tracking-[0.16em] text-black/30"><span className="h-px flex-1 bg-black/10" /> or <span className="h-px flex-1 bg-black/10" /></div>
+              <button type="button" disabled className="auth-google" title="Google sign-in will be available soon"><span className="inline-flex items-center gap-3"><GoogleMark /> Continue with Google</span><span className="text-[0.65rem] text-black/35">Coming soon</span></button>
+              <p className="pt-2 text-center text-sm text-black/55">New to Junior Dream? <Link to={PROFESSIONAL_SIGNUP_ROUTE} className="font-medium text-[#765708] underline underline-offset-4">Create an account</Link></p>
+              <p className="text-center text-xs text-black/45">Ready to enroll in a course? <Link to={PROFESSIONAL_APPLICATION_ROUTE} className="font-medium text-[#765708] underline underline-offset-4">Apply here</Link></p>
+            </form>
+          )}
+        </div>
+        <p className="mt-6 text-center text-xs text-black/40">A focused space for your next professional chapter.</p>
+      </main>
     </div>
   );
 }
@@ -157,8 +271,35 @@ function GoogleMark() {
   return <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true"><path fill="#4285F4" d="M21.35 12.23c0-.71-.06-1.4-.18-2.05H12v3.88h5.24a4.48 4.48 0 0 1-1.94 2.94v2.44h3.14c1.84-1.7 2.91-4.2 2.91-7.21Z" /><path fill="#34A853" d="M12 21.75c2.63 0 4.84-.87 6.45-2.36l-3.14-2.44c-.87.58-1.98.92-3.31.92-2.54 0-4.7-1.72-5.47-4.03H3.29v2.52A9.74 9.74 0 0 0 12 21.75Z" /><path fill="#FBBC05" d="M6.53 13.84A5.85 5.85 0 0 1 6.22 12c0-.64.11-1.26.31-1.84V7.64H3.29A9.74 9.74 0 0 0 2.25 12c0 1.57.38 3.05 1.04 4.36l3.24-2.52Z" /><path fill="#EA4335" d="M12 6.13c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.84 3.22 14.63 2.25 12 2.25a9.74 9.74 0 0 0-8.71 5.39l3.24 2.52C7.3 7.85 9.46 6.13 12 6.13Z" /></svg>;
 }
 
-function FieldEmail({ value, onChange }: { value: string; onChange: (value: string) => void }) {
-  return <div><label htmlFor="professional-email" className="mb-2 block text-xs font-medium uppercase tracking-[0.12em] text-black/60">Email</label><div className="relative"><Mail className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-black/35" size={16} aria-hidden="true" /><input id="professional-email" type="email" autoComplete="email" required value={value} onChange={(event) => onChange(event.target.value)} placeholder="Enter your email" className="auth-input pl-10" /></div></div>;
+function getEmailError(value: string) {
+  if (!value.trim()) return "Please enter your email address.";
+  if (!emailPattern.test(value.trim())) return "Please enter a valid email address.";
+  return "";
+}
+
+function FieldEmail({ value, error, onChange, onBlur }: { value: string; error: string; onChange: (value: string) => void; onBlur: () => void }) {
+  return (
+    <div>
+      <label htmlFor="professional-email" className="mb-2 block text-xs font-medium uppercase tracking-[0.12em] text-black/60">Email</label>
+      <div className="relative">
+        <Mail className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-black/35" size={16} aria-hidden="true" />
+        <input
+          id="professional-email"
+          type="email"
+          autoComplete="email"
+          required
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? "professional-email-error" : undefined}
+          value={value}
+          onBlur={onBlur}
+          onChange={(event) => onChange(event.target.value)}
+          placeholder="Enter your email"
+          className="auth-input pl-10"
+        />
+      </div>
+      {error && <p id="professional-email-error" className="mt-2 text-xs text-red-700">{error}</p>}
+    </div>
+  );
 }
 
 function ErrorMessage({ message }: { message: string }) {

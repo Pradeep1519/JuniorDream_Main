@@ -2,11 +2,11 @@ import { Outlet, useLocation } from "react-router";
 import { AICounsellor } from "@/components/ai/AICounsellor";
 import { Header } from "./Header";
 import { ProfessionalFooter } from "./ProfessionalFooter";
-import { PROFESSIONAL_FORGOT_PASSWORD_ROUTE, PROFESSIONAL_LOGIN_ROUTE } from "@/lib/professionalRoutes";
+import { PROFESSIONAL_FORGOT_PASSWORD_ROUTE, PROFESSIONAL_LOGIN_ROUTE, PROFESSIONAL_SIGNUP_ROUTE } from "@/lib/professionalRoutes";
 
 export function ProfessionalLayout() {
   const location = useLocation();
-  const isAuthPage = location.pathname === PROFESSIONAL_LOGIN_ROUTE || location.pathname === PROFESSIONAL_FORGOT_PASSWORD_ROUTE;
+  const isAuthPage = location.pathname === PROFESSIONAL_LOGIN_ROUTE || location.pathname === PROFESSIONAL_SIGNUP_ROUTE || location.pathname === PROFESSIONAL_FORGOT_PASSWORD_ROUTE;
   const isProfessionalHome = location.pathname === "/professional";
 
   if (isAuthPage) {

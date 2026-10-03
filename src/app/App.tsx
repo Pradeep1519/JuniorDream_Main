@@ -6,7 +6,7 @@ import { ScrollToTop } from "@/components/layout/ScrollToTop";
 import { SiteTransitionProvider } from "@/components/layout/SiteTransitionProvider";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { ProfessionalLayout } from "@/components/layout/ProfessionalLayout";
-import { PROFESSIONAL_FORGOT_PASSWORD_ROUTE, PROFESSIONAL_LOGIN_ROUTE } from "@/lib/professionalRoutes";
+import { PROFESSIONAL_FORGOT_PASSWORD_ROUTE, PROFESSIONAL_LOGIN_ROUTE, PROFESSIONAL_SIGNUP_ROUTE } from "@/lib/professionalRoutes";
 
 const Home = lazy(() => import("@/app/routes/Home").then((module) => ({ default: module.Home })));
 const About = lazy(() => import("@/app/routes/About").then((module) => ({ default: module.About })));
@@ -83,6 +83,7 @@ function App() {
               <Route path="faq" element={<ProfessionalFAQ />} />
               <Route path="contact" element={<ProfessionalContact />} />
               <Route path={PROFESSIONAL_LOGIN_ROUTE.slice("/professional/".length)} element={<ProfessionalLogin />} />
+              <Route path={PROFESSIONAL_SIGNUP_ROUTE.slice("/professional/".length)} element={<ProfessionalLogin />} />
               <Route path={PROFESSIONAL_FORGOT_PASSWORD_ROUTE.slice("/professional/".length)} element={<ProfessionalLogin />} />
               <Route path="apply" element={<ProfessionalApply />} />
               <Route path="apply/success" element={<ProfessionalApplicationSuccess />} />

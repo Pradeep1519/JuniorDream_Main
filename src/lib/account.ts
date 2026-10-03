@@ -1,4 +1,4 @@
-import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
+import { doc, runTransaction, serverTimestamp, setDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword, deleteUser, updateProfile } from "firebase/auth";
 import type { User } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
@@ -37,6 +37,36 @@ export async function createApplicantAccount(email: string, password: string, di
   const credential = await createUserWithEmailAndPassword(auth, email, password);
   try {
     await updateProfile(credential.user, { displayName });
+  } catch (error) {
+    await deleteUser(credential.user).catch(() => undefined);
+    throw error;
+  }
+  return credential.user;
+}
+
+export async function createProfessionalAccount(email: string, password: string, displayName: string) {
+  const credential = await createUserWithEmailAndPassword(auth, email, password);
+  try {
+    await updateProfile(credential.user, { displayName });
+    await setDoc(doc(db, "users", credential.user.uid), {
+      uid: credential.user.uid,
+      name: displayName,
+      email,
+      mobile: "",
+      userType: "student",
+      studentName: displayName,
+      classApplying: "Professional",
+      previousSchool: null,
+      stream: "professional",
+      batchLevel: null,
+      tier: null,
+      applicationId: "",
+      applicationPath: "",
+      applicationStatus: "account-only",
+      platform: "professional",
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
   } catch (error) {
     await deleteUser(credential.user).catch(() => undefined);
     throw error;
